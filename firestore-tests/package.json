@@ -1,0 +1,14 @@
+{
+  "name": "tgcu-firestore-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Emulator rules-test suite for TGCU Firestore Security Rules (design/03 §5 deliverable).",
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore --project demo-tgcu \"node rules.test.mjs\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "firebase": "^11.2.0"
+  }
+}

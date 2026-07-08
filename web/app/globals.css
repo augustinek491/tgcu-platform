@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   TGCU Design System — tokens (single source of truth)
+   Real TGCU brand: kelly green + grain gold. See platform-plan/design/DESIGN-SYSTEM.md.
+   Semantic tokens only — no raw hex in components (NFR-84).
+   Dark mode = a .dark class flip of the same variables (no duplicated styles).
+   ───────────────────────────────────────────────────────────────────────── */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Brand — kelly green */
+  --brand-900: #14532d;
+  --brand-800: #166534;
+  --brand-700: #15803d;
+  --brand-600: #2e9e4f; /* matches logo */
+  --brand-500: #22c55e; /* gradients/accents only, not text */
+  --brand-300: #86efac;
+
+  /* Gold / grain */
+  --gold-arc: #e9b84a;
+  --grain-700: #b45309;
+  --grain-500: #ca8a04; /* accent / CTA */
+  --grain-300: #fcd34d;
+
+  /* Tier accents (chips/cards only) */
+  --tier-bronze: #b45309;
+  --tier-silver: #64748b;
+  --tier-gold: #ca8a04;
+  --tier-platinum: #7c3aed;
+
+  /* Neutrals — warm stone (light) */
+  --color-bg: #fafaf9;
+  --color-surface: #ffffff;
+  --color-surface-2: #f5f5f4;
+  --color-border: #e7e5e4;
+  --color-fg: #1c1917;
+  --color-muted: #57534e;
+
+  /* Semantic roles */
+  --color-primary: var(--brand-800);
+  --color-primary-hover: var(--brand-600);
+  --color-accent: var(--grain-500);
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-danger: #b91c1c;
+  --color-info: #2563eb;
+
+  /* Data-viz (blue-anchored categorical — distinct from brand green) */
+  --data: #2563eb;
+  --series-sky: #0ea5e9;
+  --series-violet: #7c3aed;
+  --series-gold: #ca8a04;
+  --series-red: #dc2626;
+  --series-teal: #0d9488;
+
+  /* Radius / elevation / motion */
+  --radius-card: 12px;
+  --radius-sm: 6px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.12);
+  --dur-fast: 150ms;
+  --dur-base: 200ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.dark {
+  --color-bg: #0c0a09;
+  --color-surface: #1c1917;
+  --color-surface-2: #292524;
+  --color-border: #292524;
+  --color-fg: #f5f5f4;
+  --color-muted: #a8a29e;
+  --color-primary: var(--brand-600);
+  --color-primary-hover: var(--brand-500);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+  }
+}
+
+/* Map tokens → Tailwind theme so utilities (bg-surface, text-fg…) track .dark */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-border: var(--color-border);
+  --color-fg: var(--color-fg);
+  --color-muted: var(--color-muted);
+
+  --color-brand-900: var(--brand-900);
+  --color-brand-800: var(--brand-800);
+  --color-brand-700: var(--brand-700);
+  --color-brand-600: var(--brand-600);
+  --color-brand-500: var(--brand-500);
+  --color-brand-300: var(--brand-300);
+  --color-gold-arc: var(--gold-arc);
+  --color-grain-700: var(--grain-700);
+  --color-grain-500: var(--grain-500);
+  --color-grain-300: var(--grain-300);
+
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-accent: var(--color-accent);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-info: var(--color-info);
+
+  --color-tier-bronze: var(--tier-bronze);
+  --color-tier-silver: var(--tier-silver);
+  --color-tier-gold: var(--tier-gold);
+  --color-tier-platinum: var(--tier-platinum);
+
+  --radius-card: var(--radius-card);
+
+  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv05", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-serif);
+  }
+  /* Tabular figures everywhere numbers align (KPIs, tables, charts) */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Always-visible focus ring (not color-only) */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}

@@ -1,0 +1,52 @@
+# ── Dependencies ──────────────────────────────────────────────
+node_modules/
+**/node_modules/
+.pnp
+.pnp.*
+
+# ── Build output ──────────────────────────────────────────────
+web/.next/
+web/out/
+# tsc output — NOTE: web/lib is SOURCE and must NOT be ignored
+functions/lib/
+/build
+*.tsbuildinfo
+web/next-env.d.ts
+
+# ── Firebase ──────────────────────────────────────────────────
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+database-debug.log*
+ui-debug.log*
+pubsub-debug.log*
+# Service-account keys must NEVER be committed
+serviceAccountKey.json
+**/serviceAccountKey.json
+*-key.json
+
+# ── Env / secrets (keep .env.example templates) ───────────────
+.env
+.env.local
+.env.production
+.env.*.local
+**/.env
+**/.env.local
+**/.env.production
+**/.env.*.local
+!**/.env.example
+
+# ── Internal working docs — kept OUT of the public repo (local only) ──
+platform-plan/
+knowledge-base/
+.claude/
+
+# ── OS / editor ───────────────────────────────────────────────
+.DS_Store
+*.pem
+.vscode/*
+!.vscode/extensions.json
+.idea/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

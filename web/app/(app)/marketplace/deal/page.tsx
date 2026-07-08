@@ -1,0 +1,30 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { DealPanel } from "@/components/marketplace/DealPanel";
+import { ACTIVE_DEAL } from "@/lib/demo/marketplace";
+
+export const metadata: Metadata = { title: "Deal" };
+
+export default function DealPage() {
+  return (
+    <div className="space-y-5">
+      <Link
+        href="/marketplace"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline dark:text-brand-500"
+      >
+        <ArrowLeft className="size-4" /> Back to marketplace
+      </Link>
+      <div>
+        <h1 className="font-display text-[28px] font-semibold text-fg">
+          Deal #{ACTIVE_DEAL.dealId}
+        </h1>
+        <p className="mt-1 text-sm text-muted">
+          {Math.round(ACTIVE_DEAL.listing.quantityKg / 1000)} MT {ACTIVE_DEAL.listing.commodity} ·{" "}
+          {ACTIVE_DEAL.seller.name} → {ACTIVE_DEAL.buyer.name}
+        </p>
+      </div>
+      <DealPanel deal={ACTIVE_DEAL} />
+    </div>
+  );
+}
