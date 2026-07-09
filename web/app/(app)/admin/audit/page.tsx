@@ -24,9 +24,12 @@ export default function AuditPage() {
             Every state-changing admin &amp; data action, append-only.
           </p>
         </div>
-        <Badge variant="neutral">
-          <Lock className="size-3" /> Append-only · update/delete denied
-        </Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="warning">Demo · seeded data</Badge>
+          <Badge variant="neutral">
+            <Lock className="size-3" /> Append-only · update/delete denied
+          </Badge>
+        </div>
       </div>
 
       <Card>
@@ -44,7 +47,10 @@ export default function AuditPage() {
               </thead>
               <tbody>
                 {auditLog.map((e) => (
-                  <tr key={e.id} className="border-b border-[var(--color-border)] last:border-0 hover:bg-surface-2">
+                  <tr
+                    key={e.id}
+                    className="border-b border-[var(--color-border)] transition-colors duration-[var(--dur-fast)] last:border-0 hover:bg-surface-2"
+                  >
                     <td className="whitespace-nowrap px-4 py-2.5 text-muted">{e.at}</td>
                     <td className="whitespace-nowrap px-4 py-2.5 text-fg">{e.actor}</td>
                     <td className="whitespace-nowrap px-4 py-2.5 text-muted">{e.role}</td>
@@ -62,7 +68,7 @@ export default function AuditPage() {
       </Card>
       <p className="text-xs text-muted">
         Tamper-evident (server-only writes, deny update/delete), not cryptographically tamper-proof
-        without a WORM export or hash-chain — stated honestly per the spec.
+        without a WORM export or hash-chain.
       </p>
     </div>
   );

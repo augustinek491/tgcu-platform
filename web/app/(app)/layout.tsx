@@ -11,7 +11,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-dvh bg-bg">
       <Sidebar isAdmin />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar />
+        {/* Topbar hosts the <1024 drawer (MobileNav) — same isAdmin as the sidebar. */}
+        <Topbar isAdmin />
         <main id="main" className="mx-auto w-full max-w-[1440px] flex-1 px-5 py-6 md:px-8">
           {children}
         </main>

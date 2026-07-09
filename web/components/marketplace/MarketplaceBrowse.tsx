@@ -2,9 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { ListingCard } from "./ListingCard";
+import { OfferDialog, type OfferDraft } from "./OfferDialog";
+import { GrainBasketIllustration } from "@/components/illustrations/empty-states";
 import { cn } from "@/lib/utils";
 import { LISTINGS } from "@/lib/demo/marketplace";
-import { GRADE_LABEL, type Grade, type ListingType } from "@/lib/marketplace/model";
+import { GRADE_LABEL, type Grade, type Listing, type ListingType } from "@/lib/marketplace/model";
 
 type Filters = {
   type: ListingType | "all";
@@ -30,6 +32,9 @@ export function MarketplaceBrowse() {
     verifiedOnly: false,
     openToOffers: false,
   });
+  // FLOW-02: offer dialog + recorded offers (session-only demo-sandbox state).
+  const [offerFor, setOfferFor] = useState<Listing | null>(null);
+  const [offers, setOffers] = useState<Record<string, OfferDraft>>({});
 
   const results = useMemo(
     () =>
@@ -55,7 +60,10 @@ export function MarketplaceBrowse() {
       <aside className="space-y-5">
         <div className="flex items-center justify-between">
           <span className="font-display text-sm font-semibold text-fg">Filters</span>
-          <button onClick={clear} className="text-xs text-brand-700 hover:underline dark:text-brand-500">
+          <button
+            onClick={clear}
+            className="inline-flex min-h-11 items-center px-2 text-xs text-brand-interactive hover:underline lg:min-h-0 lg:px-0"
+          >
             Clear all
           </button>
         </div>
@@ -104,19 +112,40 @@ export function MarketplaceBrowse() {
         {results.length ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {results.map((l) => (
-              <ListingCard key={l.listingId} listing={l} />
+              <ListingCard
+                key={l.listingId}
+                listing={l}
+                sentOffer={offers[l.listingId]}
+                onAction={setOfferFor}
+              />
             ))}
           </div>
         ) : (
           <div className="rounded-[var(--radius-card)] border border-dashed border-[var(--color-border)] p-10 text-center">
+            <GrainBasketIllustration className="mx-auto mb-3" />
             <p className="font-medium text-fg">No listings match these filters</p>
             <p className="mt-1 text-sm text-muted">Try relaxing a filter.</p>
-            <button onClick={clear} className="mt-4 text-sm font-medium text-brand-700 hover:underline dark:text-brand-500">
+            <button
+              onClick={clear}
+              className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-brand-interactive hover:underline lg:min-h-0"
+            >
               Clear all filters
             </button>
           </div>
         )}
       </div>
+
+      {offerFor && (
+        <OfferDialog
+          listing={offerFor}
+          initial={offers[offerFor.listingId]}
+          onClose={() => setOfferFor(null)}
+          onSubmit={(draft) => {
+            setOffers((p) => ({ ...p, [offerFor.listingId]: draft }));
+            setOfferFor(null);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -146,7 +175,8 @@ function Segmented<T extends string>({
           key={o.v}
           onClick={() => onChange(o.v)}
           className={cn(
-            "flex-1 px-2 py-1.5 text-xs font-medium transition-colors",
+            // min-h-11 = 44px touch target <lg (MOB-03); desktop keeps the compact control.
+            "min-h-11 flex-1 px-2 py-1.5 text-xs font-medium transition-colors lg:min-h-0",
             value === o.v ? "bg-brand-800 text-white" : "text-muted hover:bg-surface-2",
           )}
         >
@@ -175,7 +205,7 @@ function Radio({
           key={o}
           onClick={() => onChange(o)}
           className={cn(
-            "block w-full rounded-[var(--radius-sm)] px-2 py-1 text-left text-sm transition-colors",
+            "flex min-h-11 w-full items-center rounded-[var(--radius-sm)] px-2 py-1 text-left text-sm transition-colors lg:min-h-0",
             value === o ? "bg-brand-800/10 font-medium text-brand-800 dark:bg-brand-600/15 dark:text-brand-300" : "text-muted hover:bg-surface-2",
           )}
         >
@@ -188,7 +218,7 @@ function Radio({
 
 function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2 text-sm text-fg">
+    <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-fg lg:min-h-0">
       <input
         type="checkbox"
         checked={checked}

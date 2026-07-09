@@ -6,9 +6,9 @@ import { TIERS } from "@/lib/membership/tiers";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Membership plans",
+  title: "Membership tiers",
   description:
-    "Choose a TGCU data plan — deeper grain price history and market tracking as your needs grow. Pricing announced at launch.",
+    "Choose a TGCU membership tier — deeper grain price history and market tracking as your needs grow. Pricing announced at launch.",
 };
 
 // Static: tier definitions + public copy are stable → SSG/ISR, no Firebase (design/02 §1.1).
@@ -16,14 +16,14 @@ export const revalidate = 3600;
 
 export default function PricingPage() {
   return (
-    <section className="mx-auto w-full max-w-[1200px] px-5 py-16">
+    <section className="mx-auto w-full max-w-[1280px] px-6 py-section-sm">
       <div className="mx-auto max-w-2xl text-center">
         <Badge variant="brand" className="mb-4">
           TGCU Membership
         </Badge>
-        <h1 className="font-display text-4xl font-semibold text-fg">Choose your data plan</h1>
+        <h1 className="font-display text-4xl font-semibold text-fg">Choose your membership tier</h1>
         <p className="mt-4 text-lg text-muted">
-          Unlock deeper grain price history and market tracking. Every plan builds on the last —
+          Unlock deeper grain price history and market tracking. Every tier builds on the last —
           start with today&apos;s prices, then reach further back and follow goods in transit as
           your needs grow.
         </p>
@@ -79,9 +79,9 @@ export default function PricingPage() {
       </div>
 
       <p className="mx-auto mt-10 max-w-3xl text-center text-xs text-muted">
-        Plans unlock how far back you can see and what you can track — prices are monthly wholesale
-        figures with provenance shown per record. History depth per FR-MEM-11.1. Informational, not
-        financial advice. · Demo screen; pricing announced at launch.
+        Tiers differ only in how far back you can see and what you can track — prices are monthly
+        wholesale figures with provenance shown per record. Informational, not financial advice. ·
+        Demo screen; pricing announced at launch.
       </p>
     </section>
   );

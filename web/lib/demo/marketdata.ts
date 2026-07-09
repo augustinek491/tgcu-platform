@@ -20,8 +20,8 @@ export type Market = {
   name: string;
   region: string;
   mult: number; // market basis multiplier
-  x: number; // SVG map position (0..220)
-  y: number; // SVG map position (0..180)
+  lat: number; // true WGS84 latitude (rubric M12 coordinate table, ±0.05°)
+  lon: number; // true WGS84 longitude
   reporting: boolean; // reported in the latest period? (coverage honesty)
 };
 
@@ -40,14 +40,14 @@ export const COMMODITIES: Commodity[] = [
 ];
 
 export const MARKETS: Market[] = [
-  { id: "mbarara", name: "Mbarara", region: "Western", mult: 1.08, x: 70, y: 138, reporting: true },
-  { id: "kampala", name: "Kampala", region: "Central", mult: 1.0, x: 118, y: 118, reporting: true },
-  { id: "jinja", name: "Jinja", region: "Eastern", mult: 0.99, x: 138, y: 116, reporting: true },
-  { id: "mbale", name: "Mbale", region: "Eastern", mult: 0.94, x: 166, y: 96, reporting: true },
-  { id: "masindi", name: "Masindi", region: "Western", mult: 0.9, x: 92, y: 84, reporting: true },
-  { id: "gulu", name: "Gulu", region: "Northern", mult: 0.86, x: 104, y: 54, reporting: true },
-  { id: "lira", name: "Lira", region: "Northern", mult: 0.84, x: 128, y: 58, reporting: false },
-  { id: "soroti", name: "Soroti", region: "Eastern", mult: 0.88, x: 150, y: 70, reporting: false },
+  { id: "mbarara", name: "Mbarara", region: "Western", mult: 1.08, lat: -0.608, lon: 30.655, reporting: true },
+  { id: "kampala", name: "Kampala", region: "Central", mult: 1.0, lat: 0.348, lon: 32.583, reporting: true },
+  { id: "jinja", name: "Jinja", region: "Eastern", mult: 0.99, lat: 0.424, lon: 33.204, reporting: true },
+  { id: "mbale", name: "Mbale", region: "Eastern", mult: 0.94, lat: 1.078, lon: 34.175, reporting: true },
+  { id: "masindi", name: "Masindi", region: "Western", mult: 0.9, lat: 1.685, lon: 31.715, reporting: true },
+  { id: "gulu", name: "Gulu", region: "Northern", mult: 0.86, lat: 2.775, lon: 32.299, reporting: true },
+  { id: "lira", name: "Lira", region: "Northern", mult: 0.84, lat: 2.247, lon: 32.9, reporting: false },
+  { id: "soroti", name: "Soroti", region: "Eastern", mult: 0.88, lat: 1.715, lon: 33.611, reporting: false },
 ];
 
 export const RANGES = [3, 6, 12, 24] as const;
@@ -150,6 +150,19 @@ export function movers() {
       toMonth: MONTHS[23],
     };
   }).sort((a, b) => Math.abs(b.pct) - Math.abs(a.pct));
+}
+
+/** Reporting-market average by month over the last `count` months — feeds the movers
+ * mini-sparklines (06 A.7 / DV-07). Same population as `movers()` (non-reporting markets
+ * structurally excluded); a month with zero observations yields null, never a bridge. */
+export function nationalSeries(commodityId: string, count = 8): (number | null)[] {
+  const reporting = MARKETS.filter((m) => m.reporting);
+  return MONTHS.slice(24 - count).map((mo) => {
+    const vals = reporting
+      .map((m) => priceAt(commodityId, m.id, mo.index))
+      .filter((v): v is number => v != null);
+    return vals.length ? Math.round(vals.reduce((s, v) => s + v, 0) / vals.length) : null;
+  });
 }
 
 /** National outlook: coverage + per-commodity direction for the latest period (FR-MKT-14). */

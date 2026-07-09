@@ -1,26 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Newsreader, Public_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Newsreader, Public_Sans } from "next/font/google";
 import { Providers } from "@/lib/providers";
 import "./globals.css";
 
-// Self-hosted via next/font (no render-blocking Google request, swap, Latin-Extended
-// subset covers Luganda diacritics) — design/02 §5.4.
+// Self-hosted via next/font (no render-blocking Google request, swap) — design/02 §5.4.
+// Canonical weights per DS §9.2/AM-09: Newsreader 500/600 · Public Sans 400/500/600.
+// Only `latin` is preloaded (PERF-01: ≤120KB budget); latin-ext stays declared with
+// unicode-range so Luganda diacritics fetch on demand the day they render (FR-MEM-92
+// readiness preserved). IBM Plex Mono is admin-scoped — see app/(app)/admin/layout.tsx.
 const newsreader = Newsreader({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600"],
+  subsets: ["latin"],
+  weight: ["500", "600"],
   variable: "--font-newsreader",
   display: "swap",
 });
 const publicSans = Public_Sans({
-  subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-public-sans",
-  display: "swap",
-});
-const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-ibm-plex-mono",
+  weight: ["400", "500", "600"],
+  variable: "--font-public-sans",
   display: "swap",
 });
 
@@ -45,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${newsreader.variable} ${publicSans.variable} ${ibmPlexMono.variable}`}
+      className={`${newsreader.variable} ${publicSans.variable}`}
     >
       <body>
         <a

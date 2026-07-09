@@ -5,7 +5,7 @@ import { Check, Loader2, Smartphone } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatUGX } from "@/lib/utils";
+import { formatDay, formatUGX } from "@/lib/utils";
 import type { Invoice } from "@/lib/membership/model";
 
 type PayState = "idle" | "initiated" | "awaiting" | "success";
@@ -67,7 +67,7 @@ export function DuesCard({ invoices }: { invoices: Invoice[] }) {
                   )}
                 </div>
                 <div className="mt-0.5 text-xs text-muted">
-                  {inv.periodLabel} · due {inv.dueDate}
+                  {inv.periodLabel} · due {formatDay(inv.dueDate)}
                 </div>
               </div>
               <div className="flex items-center gap-3">

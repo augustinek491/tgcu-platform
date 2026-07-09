@@ -41,6 +41,9 @@ platform-plan/
 knowledge-base/
 .claude/
 
+# ── Large local assets (deployed via Firebase hosting, too big for GitHub) ──
+web/public/tiles/*.pmtiles
+
 # ── OS / editor ───────────────────────────────────────────────
 .DS_Store
 *.pem

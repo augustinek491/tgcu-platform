@@ -9,11 +9,18 @@ const buttonVariants = cva(
       variant: {
         primary:
           "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]",
-        cta: "bg-[var(--color-accent)] text-white hover:brightness-110",
+        // Gold CTA carries dark text — never white (DS §9.1 / 06 F.1 locked; A11Y-04).
+        // Hover per 06 F.1: grain-700 + white (light) / grain-300 + dark ink (dark).
+        // `cta-glint` = harvest sheen sweep on hover (DS §9.6 / P2; globals.css) —
+        // opacity/transform only, absolute pseudo, no layout shift.
+        cta: "cta-glint bg-[var(--color-accent)] text-on-accent hover:bg-grain-700 hover:text-white dark:hover:bg-grain-300 dark:hover:text-on-accent",
         secondary:
           "border border-[var(--color-border)] bg-surface text-fg hover:bg-surface-2",
         ghost: "text-fg hover:bg-surface-2",
-        danger: "bg-[var(--color-danger)] text-white hover:brightness-110",
+        // Token-derived hover shift riding the 150ms transition-colors — replaces the
+        // hover:brightness-110 `filter` 0ms snap (MOT-04; H.2 sanctions color/bg only).
+        danger:
+          "bg-[var(--color-danger)] text-white hover:bg-[color-mix(in_srgb,var(--color-danger)_85%,black)]",
       },
       size: {
         sm: "h-9 px-3",

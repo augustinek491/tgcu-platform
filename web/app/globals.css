@@ -38,14 +38,55 @@
   --color-fg: #1c1917;
   --color-muted: #57534e;
 
-  /* Semantic roles */
+  /* Semantic roles (FILLS/BORDERS/large graphics — for text use the *-text pairs below) */
   --color-primary: var(--brand-800);
-  --color-primary-hover: var(--brand-600);
+  --color-primary-hover: var(--brand-700); /* white stays ≥4.5:1 while hovered (A11Y-05; brand-600 was 3.43:1) */
   --color-accent: var(--grain-500);
   --color-success: #15803d;
   --color-warning: #b45309;
   --color-danger: #b91c1c;
   --color-info: #2563eb;
+
+  /* Dark-safe semantic TEXT tokens (DS §9.1 / AM-01) — each pair ≥4.5:1 on its theme's surface.
+     Use these for deltas, status text, semantic copy; keep --color-success & co. for fills. */
+  --success-text: #15803d;
+  --danger-text: #b91c1c;
+  --warning-text: #b45309;
+  --info-text: #2563eb;
+
+  /* Badge/chip text-safe steps (AM-04) — text on tinted chips (bg tint ~14% light / ~20% dark).
+     One step darker than the plain-text tokens so 12px chip text clears 4.5:1 on its own tint
+     (measured: #166534 5.8:1 · #92400e 5.8:1 · #b91c1c 5.1:1 · #1d4ed8 5.5:1 on their 14% tints). */
+  --success-badge-text: #166534;
+  --warning-badge-text: #92400e;
+  --danger-badge-text: #b91c1c;
+  --info-badge-text: #1d4ed8;
+
+  /* Tier text-safe steps (DS §9.1 / AM-04) — tier NAME/label text on ≤20% tier tints.
+     Tier accents (--tier-*) remain for chip dots/borders/fills only, never as text. */
+  --tier-bronze-text: #b45309;
+  --tier-silver-text: #475569;
+  --tier-gold-text: var(--grain-700);
+  --tier-platinum-text: #7c3aed;
+
+  /* Brand interactive text (DS §9.1 / AM-02) — links & active nav; never brand-500 as text */
+  --brand-interactive: var(--brand-700);
+
+  /* Focus ring (DS §9.1 / AM-03) — the ONLY focus-ring color */
+  --ring: var(--brand-600);
+
+  /* Rating stars (AM-26) — never tier-gold */
+  --rating-star: var(--grain-500);
+
+  /* Text on the gold CTA / --color-accent surfaces (06 F.1, locked): dark ink, never white.
+     #1c1917 on --grain-500 = 5.95:1 (brand-900 green measures 3.10:1 — fails AA, so ink it is). */
+  --on-accent: #1c1917;
+
+  /* Sidebar muted text (06 A.3) — stays AA when the dark sidebar becomes --brand-900 */
+  --sidebar-muted: var(--color-muted);
+
+  /* Skeleton grain-sweep sheen (AM-23 motif family) */
+  --shimmer: rgb(202 138 4 / 0.08);
 
   /* Data-viz (blue-anchored categorical — distinct from brand green) */
   --data: #2563eb;
@@ -55,15 +96,27 @@
   --series-red: #dc2626;
   --series-teal: #0d9488;
 
-  /* Radius / elevation / motion */
+  /* Radius / elevation */
   --radius-card: 12px;
   --radius-sm: 6px;
   --radius-pill: 999px;
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04);
   --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.12);
-  --dur-fast: 150ms;
-  --dur-base: 200ms;
+
+  /* Motion (06 PART H.2 table + AM-13/AM-14) — durations per interaction, transform/opacity-first */
+  --dur-fast: 150ms; /* button/row hover: color/bg/border */
+  --dur-base: 200ms; /* modal in · toast · route transition · theme crossfade */
+  --dur-menu: 160ms; /* dropdown/menu open · modal scrim */
+  --dur-card: 180ms; /* card hover border/shadow */
+  --dur-drawer: 220ms; /* drawer / sidebar translateX */
+  --dur-status: 240ms; /* status/stepper/delta·number updates (AM-13) */
+  --dur-draw: 400ms; /* chart draw-in, once */
+  --dur-shimmer: 1400ms; /* skeleton grain-sweep loop */
+  --dur-focus: 0ms; /* focus ring appears instantly (AM-14) */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0, 0, 0.58, 1); /* H.2 default easing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); /* dropdown/menu open (H.2) */
+  --ease-linear: linear;
 }
 
 .dark {
@@ -73,17 +126,93 @@
   --color-border: #292524;
   --color-fg: #f5f5f4;
   --color-muted: #a8a29e;
-  --color-primary: var(--brand-600);
-  --color-primary-hover: var(--brand-500);
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+  /* Primary fill: --brand-800 (white text ≈ 7.1:1) — brand-600 was 3.43:1, the AF-4 trigger (DM-04/A11Y-05) */
+  --color-primary: var(--brand-800);
+  --color-primary-hover: var(--brand-700); /* white ≈ 5.0:1 */
+  /* Dark cards separate by border + one surface step — NO shadows (06 H.1 / §0; DM-01) */
+  --shadow-card: none;
   --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.5);
+  /* Dark-safe semantic text (DS §9.1) — 400-series ramps, ≥4.5:1 on --surface and --bg (DM-05/A11Y-01) */
+  --success-text: #4ade80;
+  --danger-text: #f87171;
+  --warning-text: #fbbf24;
+  --info-text: #60a5fa;
+  /* On ~20% dark tints the same 400-series steps clear ≥5:1 (AM-04) */
+  --success-badge-text: var(--success-text);
+  --warning-badge-text: var(--warning-text);
+  --danger-badge-text: var(--danger-text);
+  --info-badge-text: var(--info-text);
+  /* Tier text-safe steps — 300-series in dark (DS §9.1) */
+  --tier-bronze-text: #fcd34d;
+  --tier-silver-text: #cbd5e1;
+  --tier-gold-text: var(--grain-300);
+  --tier-platinum-text: #c4b5fd;
+  --brand-interactive: var(--brand-300);
+  --ring: var(--brand-300);
+  --rating-star: var(--grain-300);
+  --sidebar-muted: #d6d3d1; /* stone-300 — 6.1:1 on the --brand-900 dark sidebar (06 A.3) */
+  --shimmer: rgb(252 211 77 / 0.06);
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
     --dur-fast: 0ms;
     --dur-base: 0ms;
+    --dur-menu: 0ms;
+    --dur-card: 0ms;
+    --dur-drawer: 0ms;
+    --dur-status: 0ms;
+    --dur-draw: 0ms;
   }
+  /* Static skeleton/spinner — Tailwind's animate-* utilities don't consume the zeroed
+     duration vars, so kill the animations outright (H.2 reduced-motion rule; A11Y-12). */
+  .skeleton,
+  .animate-pulse,
+  .animate-spin {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Type scale — the ONLY sanctioned sizes (DS §3 + §9.2/AM-10):
+   {12, 14, 16, 20, 28, 40} + 32 sanctioned SOLELY as the responsive H1 step @768.
+   `--text-*: initial` wipes Tailwind's default scale so off-scale utilities
+   (18/24/30/36/48/60px…) cannot be emitted; the named steps below re-map every
+   existing utility to its nearest sanctioned size. 12px is the rendered floor —
+   nothing (including provenance lines) may render below it. Body & ALL inputs ≥16px.
+   ───────────────────────────────────────────────────────────────────────── */
+@theme {
+  --text-*: initial;
+  --text-xs: 0.75rem; /* 12 — scale floor */
+  --text-xs--line-height: 1.4;
+  --text-sm: 0.875rem; /* 14 */
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem; /* 16 — body minimum; inputs never below this (iOS no-zoom) */
+  --text-base--line-height: 1.55;
+  --text-lg: 1.25rem; /* 20 (Tailwind's 18px is off-scale → mapped to the 20 step; 06 F card titles = 20) */
+  --text-lg--line-height: 1.4;
+  --text-xl: 1.25rem; /* 20 */
+  --text-xl--line-height: 1.4;
+  --text-2xl: 1.75rem; /* 28 (24px off-scale → 28; 06 B login H1 = 28) */
+  --text-2xl--line-height: 1.25;
+  --text-3xl: 1.75rem; /* 28 */
+  --text-3xl--line-height: 1.25;
+  --text-4xl: 2rem; /* 32 — responsive-H1-only step (AM-10) */
+  --text-4xl--line-height: 1.2;
+  --text-5xl: 2.5rem; /* 40 — H1 / flagship-number ceiling */
+  --text-5xl--line-height: 1.15;
+
+  /* Marketing macro-spacing (AM-20) — marketing section padding ONLY (py-section-*) */
+  --spacing-section-sm: 5rem; /* 80 */
+  --spacing-section: 6rem; /* 96 */
+  --spacing-section-lg: 8rem; /* 128 */
+  /* Dense-card variant (AM-21): p-card-dense = 16px for admin queues/listing grids;
+     default card padding stays 20–24 (p-5/p-6). The core 8px-grid vocabulary
+     {4,8,12,16,24,32,48,64} = p-1/2/3/4/6/8/12/16 on the default spacing scale. */
+  --spacing-card-dense: 1rem;
+
+  /* Skeleton shimmer utility (grain-sweep motif — AM-23 / H.2 "1400ms linear") */
+  --animate-grain-sweep: grain-sweep var(--dur-shimmer, 1400ms) linear infinite;
 }
 
 /* Map tokens → Tailwind theme so utilities (bg-surface, text-fg…) track .dark */
@@ -119,16 +248,36 @@
   --color-tier-gold: var(--tier-gold);
   --color-tier-platinum: var(--tier-platinum);
 
+  /* Dark-safe text roles (utilities: text-success-text, text-brand-interactive, …) */
+  --color-success-text: var(--success-text);
+  --color-danger-text: var(--danger-text);
+  --color-warning-text: var(--warning-text);
+  --color-info-text: var(--info-text);
+  --color-brand-interactive: var(--brand-interactive);
+  --color-ring: var(--ring);
+  --color-rating-star: var(--rating-star);
+  --color-on-accent: var(--on-accent);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-tier-bronze-text: var(--tier-bronze-text);
+  --color-tier-silver-text: var(--tier-silver-text);
+  --color-tier-gold-text: var(--tier-gold-text);
+  --color-tier-platinum-text: var(--tier-platinum-text);
+
   --radius-card: var(--radius-card);
 
   --font-serif: var(--font-newsreader), Georgia, serif;
   --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  /* Mono is admin-scoped (02 §5.4): --font-ibm-plex-mono only exists inside the
+     admin layout subtree; everywhere else the var() fallback keeps a system mono stack. */
+  --font-mono: var(--font-ibm-plex-mono, ui-monospace), ui-monospace, "SFMono-Regular", monospace;
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
+    /* Pre-set the ring color so it never transitions in from currentColor —
+       the ring must appear instantly (AM-14); invisible until focus sets a style/width. */
+    outline-color: var(--ring);
   }
   html {
     -webkit-text-size-adjust: 100%;
@@ -137,21 +286,276 @@
     background: var(--color-bg);
     color: var(--color-fg);
     font-family: var(--font-sans);
-    font-feature-settings: "cv05", "ss01";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
   h1, h2, h3, .font-display {
     font-family: var(--font-serif);
   }
-  /* Tabular figures everywhere numbers align (KPIs, tables, charts) */
+  /* Tabular figures everywhere numbers align (DS §3: tables, KPIs, charts) — TYP-04 */
+  table {
+    font-variant-numeric: tabular-nums;
+  }
   .tabular {
     font-variant-numeric: tabular-nums;
   }
-  /* Always-visible focus ring (not color-only) */
+  /* Inputs never render below 16px (DS §9.2 — prevents iOS focus-zoom) — TYP-06 */
+  input,
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+  /* Always-visible focus ring — 2px --ring + 2px offset, never removed (DS §9.1/AM-03; 06 H.2).
+     --ring = brand-600 light / brand-300 dark. Do not add `outline-none` to any control (DS §8). */
   :focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--ring);
     outline-offset: 2px;
-    border-radius: 4px;
+  }
+}
+
+/* ── Skeleton: grain-sweep shimmer (H.2 "Skeleton shimmer 1400ms loop, linear, gradient
+   sweep"; AM-23 motif family). Base tone = --color-surface-2; harvest-gold sheen via
+   --shimmer. Under prefers-reduced-motion the animation is removed (static skeleton). */
+@keyframes grain-sweep {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@layer components {
+  .skeleton {
+    background-color: var(--color-surface-2);
+    background-image: linear-gradient(100deg, transparent 35%, var(--shimmer) 50%, transparent 65%);
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    border-radius: var(--radius-sm);
+    animation: grain-sweep var(--dur-shimmer) linear infinite;
+  }
+
+  /* Sidebar active item — dark mode adds the 3px --grain-500 accent bar
+     (06 A.3 / H.1; DM-02). Light active treatment is tint + weight, unchanged. */
+  .nav-item-active {
+    position: relative;
+  }
+  .dark .nav-item-active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--grain-500);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   γ-motion — global motion system (round-1 fixes; 06 PART H.2 + DS §9.5/§9.6).
+   Append-only: α's tokens above are consumed, never modified. CSS + WAAPI only.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+/* MOT-07: Tailwind's default transition easing is cubic-bezier(0.4,0,0.2,1); H.2
+   prescribes ease-out for every interaction row. Overriding the v4 default makes
+   every `transition-*` utility ride --ease-out app-wide (button/card/nav/tabs/rows)
+   unless a component sets an explicit easing (shimmer stays linear, menus expo). */
+@theme {
+  --default-transition-timing-function: var(--ease-out);
+}
+
+/* ── Enter keyframes (opacity/transform only — H.2 global rule) ──────────── */
+/* Route/page content: 200ms ease-out opacity + 4px rise (H.2 row 8; MOT-05) */
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Dropdown/menu open: emerges 4px from its trigger (H.2 row 4; MOT-11 class) */
+@keyframes menu-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Modal panel: opacity + scale 0.98→1 (H.2 row 5) */
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* Scrim / plain fade (H.2 row 5 scrim column) */
+@keyframes fade-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Toast: opacity + 8px rise (H.2 row 7) */
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* CTA harvest glint sweep (DS §9.6 motif; P2 — replaces the unlawful brightness snap) */
+@keyframes cta-glint-sweep {
+  from {
+    transform: translateX(-101%);
+  }
+  to {
+    transform: translateX(101%);
+  }
+}
+
+@layer components {
+  /* H.2 row 8 — applied by app/(app)/template.tsx on client-side navigations only
+     (first document load stays static so LCP paint is never delayed). No fill mode:
+     after 200ms the wrapper returns to `transform: none`, so it never remains a
+     containing block for fixed-position descendants (dialog scrims). */
+  .route-enter {
+    animation: route-enter var(--dur-base) var(--ease-out);
+  }
+  /* H.2 row 4 — dropdown/menu open: 160ms cubic(0.16,1,0.3,1) opacity+translateY */
+  .menu-enter {
+    animation: menu-enter var(--dur-menu) var(--ease-out-expo);
+  }
+  /* H.2 row 5 — modal 200ms / scrim 160ms */
+  .modal-enter {
+    animation: modal-enter var(--dur-base) var(--ease-out);
+  }
+  .scrim-enter {
+    animation: fade-enter var(--dur-menu) var(--ease-out);
+  }
+  /* H.2 row 7 — toast in: 200ms opacity + translateY 8px. No toast component exists
+     in v1 yet; the timing utility is ready so any future toast conforms by class. */
+  .toast-enter {
+    animation: toast-enter var(--dur-base) var(--ease-out);
+  }
+  /* DS §9.5 — status/stepper state change: 240ms ease-out opacity(+color) tween.
+     Rides --dur-status, which α zeroes under prefers-reduced-motion. */
+  .status-fade {
+    transition:
+      opacity var(--dur-status) var(--ease-out),
+      background-color var(--dur-status) var(--ease-out),
+      border-color var(--dur-status) var(--ease-out),
+      color var(--dur-status) var(--ease-out);
+  }
+  /* DS §9.6 / P2 — harvest glint: a single gold-white sheen sweeps the gold CTA once
+     per hover-enter. Absolute pseudo (inset:0, pointer-events:none) → zero layout
+     shift; transform/opacity only; 250ms ≤ the 300ms budget. */
+  .cta-glint {
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-glint::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgb(255 255 255 / 0.32) 50%,
+      transparent 60%
+    );
+    transform: translateX(-101%);
+  }
+  .cta-glint:hover::after {
+    animation: cta-glint-sweep 250ms var(--ease-out);
+  }
+}
+
+/* ── Theme crossfade (H.2 row 11: 200ms ease; MOT-03) ────────────────────────
+   Primary path: native View Transitions API — ThemeToggle wraps setTheme in
+   document.startViewTransition and scopes it with .theme-vt on <html>.
+   [data-crossfade-exempt] (the /market map island marks itself — WebGL) is lifted
+   into its own view-transition layer with ALL animations disabled: it is excluded
+   from the root snapshot pair and swaps live, so the canvas never flashes blank.
+   NOTE: view-transition-name must be unique per page — one exempt region per page
+   (the single map island today). */
+.theme-vt::view-transition-old(root),
+.theme-vt::view-transition-new(root) {
+  animation-duration: var(--dur-base);
+  animation-timing-function: ease;
+}
+[data-crossfade-exempt] {
+  view-transition-name: crossfade-exempt;
+}
+::view-transition-group(crossfade-exempt),
+::view-transition-image-pair(crossfade-exempt),
+::view-transition-old(crossfade-exempt),
+::view-transition-new(crossfade-exempt) {
+  animation: none;
+}
+
+/* Fallback path (no View Transitions support): ThemeToggle adds .theme-fade to
+   <html> for ~250ms around the class flip — colors ease over 200ms, no hard cut.
+   Unlayered on purpose so it outranks @layer'd utility transitions; the exempt
+   subtree is explicitly opted back out. */
+.theme-fade,
+.theme-fade *,
+.theme-fade *::before,
+.theme-fade *::after {
+  transition:
+    background-color var(--dur-base) ease,
+    border-color var(--dur-base) ease,
+    color var(--dur-base) ease,
+    fill var(--dur-base) ease,
+    stroke var(--dur-base) ease,
+    outline-color var(--dur-base) ease,
+    box-shadow var(--dur-base) ease !important;
+}
+.theme-fade [data-crossfade-exempt],
+.theme-fade [data-crossfade-exempt] *,
+.theme-fade [data-crossfade-exempt] *::before,
+.theme-fade [data-crossfade-exempt] *::after {
+  transition: none !important;
+}
+
+/* ── γ-motion reduced-motion guard (H.2 last bullet) — additive to α's token
+   zeroing above: every γ animation is removed outright; theme switch and logo
+   draw-in are additionally JS-gated behind matchMedia in their components. */
+@media (prefers-reduced-motion: reduce) {
+  .route-enter,
+  .menu-enter,
+  .modal-enter,
+  .scrim-enter,
+  .toast-enter,
+  .cta-glint:hover::after {
+    animation: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .theme-fade,
+  .theme-fade *,
+  .theme-fade *::before,
+  .theme-fade *::after {
+    transition: none !important;
   }
 }

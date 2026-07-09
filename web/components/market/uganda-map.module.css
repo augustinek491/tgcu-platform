@@ -1,0 +1,260 @@
+/* UgandaMap island — map-scoped styles (tokens only; globals.css untouched).
+   Pins are real DOM buttons in a positioned overlay (MAP-04 fix): 44px hit
+   areas around an 18px visual dot, CSS-only tooltip on hover AND focus-visible
+   (keyboard parity), entrance stagger via --pin-delay (DS §9.6 east→west
+   motif; disabled under prefers-reduced-motion per H.2). */
+
+.mapShell {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+}
+
+.canvasHost {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── Pins ─────────────────────────────────────────────────────────────── */
+
+.pinLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 44px; /* ≥44px touch target (DS §5) — visual dot stays 18px */
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.pin:hover,
+.pin:focus-visible {
+  z-index: 6; /* hovered tooltip above sibling pins */
+}
+
+.dot {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--color-surface);
+  /* Hairline fg-mix edge = crisp on pale land AND dark earth (MAP-06 lesson) */
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-fg) 28%, transparent);
+  opacity: 0; /* revealed by .pinIn (east→west stagger, once) */
+}
+
+.pinIn .dot {
+  animation: pin-in var(--dur-status, 240ms) var(--ease-out, ease-out) both;
+  animation-delay: var(--pin-delay, 0ms);
+}
+
+@keyframes pin-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pin:hover .dot {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-fg) 48%, transparent);
+}
+
+/* Selected pin = --ring halo (the app's single selection/focus hue) */
+.pinSelected .dot,
+.pinSelected:hover .dot {
+  box-shadow:
+    0 0 0 2px var(--color-surface),
+    0 0 0 4px var(--ring);
+}
+
+/* Non-reporting market: --border hatch + dashed muted ring — never a price
+   color, never on the ramp (06 A.9/H.1 coverage honesty). */
+.pinNoData .dot {
+  border: 1.5px dashed var(--color-muted);
+  background: repeating-linear-gradient(
+    135deg,
+    var(--color-border) 0 2.5px,
+    var(--color-surface) 2.5px 5px
+  );
+}
+
+/* ── Tooltip (visual duplicate of the button's aria-label facts) ──────── */
+
+.tip {
+  position: absolute;
+  bottom: calc(50% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 200px;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.4;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-pop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast, 150ms) var(--ease-out, ease-out);
+}
+
+/* Eastern-edge pins lean the tooltip west so it isn't clipped by the shell */
+.tipWest {
+  left: auto;
+  right: calc(50% - 40px);
+  transform: none;
+}
+
+.pin:hover .tip,
+.pin:focus-visible .tip {
+  opacity: 1;
+}
+
+.tipTitle {
+  display: block;
+  font-weight: 600;
+  color: var(--color-fg);
+}
+
+.tipPrice {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-fg);
+}
+
+.tipNoData {
+  display: block;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.tipDelta {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.tipDeltaUp {
+  color: var(--success-text);
+}
+
+.tipDeltaDown {
+  color: var(--danger-text);
+}
+
+.tipMeta {
+  display: block;
+  margin-top: 2px;
+  color: var(--color-muted);
+}
+
+/* ── Zoom controls (≥44px, labelled, token-styled) ────────────────────── */
+
+.zoomCtrl {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zoomBtn {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--color-surface);
+  color: var(--color-fg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: background-color var(--dur-fast, 150ms) var(--ease-out, ease-out);
+}
+
+.zoomBtn:hover {
+  background: var(--color-surface-2);
+}
+
+/* ── Skeleton overlay (island mounted → tiles still streaming) ────────── */
+
+.skelWrap {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+.skelHide {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-status, 240ms) var(--ease-out, ease-out);
+}
+
+/* ── MapLibre chrome, re-tokened (attribution stays visible & ≥12px) ──── */
+
+.mapShell :global(.maplibregl-ctrl-attrib) {
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  color: var(--color-muted);
+  font: 500 12px/1.3 var(--font-sans);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm) 0 0 0;
+}
+
+.mapShell :global(.maplibregl-ctrl-attrib a) {
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.mapShell :global(.maplibregl-ctrl-attrib a:hover),
+.mapShell :global(.maplibregl-ctrl-attrib a:focus-visible) {
+  color: var(--color-fg);
+  text-decoration: underline;
+}
+
+.mapShell :global(.maplibregl-cooperative-gesture-screen) {
+  font: 500 14px/1.4 var(--font-sans);
+}
+
+/* Canvas keyboard focus — draw the ring inside the clipped shell */
+.mapShell :global(.maplibregl-canvas:focus-visible) {
+  outline: 2px solid var(--ring);
+  outline-offset: -3px;
+}
+
+/* ── Reduced motion: pins render final, tooltip snaps (H.2) ───────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .pinIn .dot {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .tip,
+  .skelHide {
+    transition: none;
+  }
+}

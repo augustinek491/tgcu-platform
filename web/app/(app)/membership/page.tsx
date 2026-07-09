@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Check, Lock, ArrowUpRight, Download } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { TierBadge, StandingBadge, VerifiedBadge } from "@/components/membership/badges";
 import { DuesCard } from "@/components/membership/DuesCard";
@@ -9,7 +10,7 @@ import { currentOrg, invoicesForOrg, receiptsForOrg } from "@/lib/demo/membershi
 import { tierById } from "@/lib/membership/tiers";
 import { hasEntitlement, isVerified } from "@/lib/membership/model";
 import { ENTITLEMENT_LABEL, ENTITLEMENT_ORDER } from "@/lib/membership/labels";
-import { formatUGX } from "@/lib/utils";
+import { formatDay, formatUGX } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Membership" };
 
@@ -40,7 +41,8 @@ export default function MembershipPage() {
             {new Date(org.memberSince).getFullYear()}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="warning">Demo · seeded data</Badge>
           <TierBadge tierId={org.tierId} />
           <StandingBadge standing={org.standing} />
         </div>
@@ -51,12 +53,12 @@ export default function MembershipPage() {
         <Card className="lg:col-span-2">
           <CardHeader className="flex-row items-center justify-between">
             <div>
-              <CardTitle>Your plan · {tier.name}</CardTitle>
+              <CardTitle>Your tier · {tier.name}</CardTitle>
               <p className="text-sm text-muted">{tier.historyLabel}</p>
             </div>
             {org.tierId !== "platinum" && (
               <Link href="/pricing" className={buttonVariants({ variant: "secondary", size: "sm" })}>
-                Upgrade <ArrowUpRight className="size-4" />
+                View tiers <ArrowUpRight className="size-4" />
               </Link>
             )}
           </CardHeader>
@@ -76,7 +78,7 @@ export default function MembershipPage() {
                     {e.label}
                     {!e.on && (
                       <Link href="/pricing" className="ml-1 text-brand-700 hover:underline dark:text-brand-500">
-                        Upgrade
+                        View tiers
                       </Link>
                     )}
                   </span>
@@ -115,12 +117,12 @@ export default function MembershipPage() {
             {receipts.map((r) => (
               <div
                 key={r.receiptId}
-                className="flex items-center justify-between rounded-[var(--radius-sm)] px-2 py-2 hover:bg-surface-2"
+                className="flex items-center justify-between rounded-[var(--radius-sm)] px-2 py-2 transition-colors duration-[var(--dur-fast)] hover:bg-surface-2"
               >
                 <div>
                   <div className="text-sm font-medium text-fg">{r.number}</div>
                   <div className="text-xs text-muted">
-                    {r.date} · {r.manual ? "recorded manually" : r.method.replace("_", " ")}
+                    {formatDay(r.date)} · {r.manual ? "recorded manually" : r.method.replace("_", " ")}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

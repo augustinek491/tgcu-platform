@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BadgeCheck, ShieldCheck, ArrowRight } from "lucide-react";
+import { ShieldCheck, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { MarketplaceBrowse } from "@/components/marketplace/MarketplaceBrowse";
 import { ACTIVE_DEAL } from "@/lib/demo/marketplace";
 import { dealAmount } from "@/lib/marketplace/model";
-import { formatUGX } from "@/lib/utils";
+import { cn, formatUGX } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Marketplace" };
 
@@ -21,9 +22,10 @@ export default function MarketplacePage() {
             Verified members trade maize, beans, rice &amp; sorghum. Escrow protects both sides.
           </p>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-[var(--color-success)]/12 px-3 py-1 text-sm font-medium text-[var(--color-success)]">
-          <BadgeCheck className="size-4" /> You&apos;re verified · good standing
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="warning">Demo · seeded data</Badge>
+          <VerifiedBadge label="You're verified · good standing" />
+        </div>
       </div>
 
       {/* Sandbox honesty banner */}
@@ -51,7 +53,7 @@ export default function MarketplacePage() {
             {ACTIVE_DEAL.dealId}
           </p>
         </div>
-        <Link href="/marketplace/deal" className={buttonVariants({ size: "sm" })}>
+        <Link href="/marketplace/deal" className={cn(buttonVariants({ size: "sm" }), "h-11 lg:h-9")}>
           Open deal <ArrowRight className="size-4" />
         </Link>
       </Card>

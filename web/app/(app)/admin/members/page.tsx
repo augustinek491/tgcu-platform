@@ -29,7 +29,7 @@ export default function AdminMembersPage() {
 
       {/* Summary */}
       <section className="grid gap-4 sm:grid-cols-4">
-        <Summary label="Member organisations" value={String(orgs.length)} caption="of 400+ tracked" />
+        <Summary label="Member organisations" value={String(orgs.length)} caption="directory sample · 10 orgs seeded" />
         <Summary label="In grace" value={String(inGrace)} caption="dues overdue, full access" tone="warn" />
         <Summary label="Suspended / lapsed" value={String(suspended)} caption="past grace" tone="danger" />
         <Summary
@@ -129,7 +129,10 @@ function Table({ head, rows }: { head: string[]; rows: React.ReactNode[][] }) {
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className="border-b border-[var(--color-border)] last:border-0 hover:bg-surface-2">
+            <tr
+              key={i}
+              className="border-b border-[var(--color-border)] transition-colors duration-[var(--dur-fast)] last:border-0 hover:bg-surface-2"
+            >
               {row.map((cell, j) => (
                 <td key={j} className="px-5 py-3 align-middle text-fg">
                   {cell}

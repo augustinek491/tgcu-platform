@@ -1,49 +1,100 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import Link from "next/link";
 import { Check, X, RotateCcw, MapPin, Camera, AlertTriangle, CircleCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { submissions as seed, FLAG_LABEL, type FieldSubmission } from "@/lib/demo/admin";
+import { submissions as seed, FLAG_LABEL } from "@/lib/demo/admin";
+import { ClipboardCheckIllustration } from "@/components/illustrations/empty-states";
 
 type Decision = "APPROVED" | "REJECTED" | "RETURNED";
+type ReasonKind = "REJECTED" | "RETURNED";
+type Recorded = { decision: Decision; reason?: string; at: string };
+
+const DECISION_LABEL: Record<Decision, string> = {
+  APPROVED: "Approved & published",
+  REJECTED: "Rejected",
+  RETURNED: "Returned for correction",
+};
 
 /**
  * Field-data verification queue (FR-ADM-05/07/08/09). Nothing enters trusted data
  * except via an explicit human APPROVE — no time-out self-publish (fail-closed).
- * Reject/return require a reason. Provenance, screening flags and the external
- * cross-check delta are surfaced so reviewers focus on suspect values.
+ * Reject/return require a reason (FR-ADM-07): the decision cannot commit until a
+ * reason is entered, and it is kept in the session decision log. Provenance,
+ * screening flags and the external cross-check delta are surfaced so reviewers
+ * focus on suspect values.
  */
 export function VerificationQueue() {
-  const [items, setItems] = useState<FieldSubmission[]>(seed);
-  const [decisions, setDecisions] = useState<Record<string, Decision>>({});
+  const items = seed;
+  const [decisions, setDecisions] = useState<Record<string, Recorded>>({});
+  const [order, setOrder] = useState<string[]>([]);
+  const [reasonFor, setReasonFor] = useState<{ id: string; kind: ReasonKind } | null>(null);
+  const [reasonText, setReasonText] = useState("");
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const logRef = useRef<HTMLElement | null>(null);
 
   const pending = items.filter((s) => !decisions[s.id]);
+  const decided = order
+    .map((id) => ({ s: items.find((i) => i.id === id)!, d: decisions[id] }))
+    .filter((r) => r.d != null);
+  const recorded = Object.values(decisions);
 
-  function decide(id: string, d: Decision) {
-    setDecisions((prev) => ({ ...prev, [id]: d }));
+  const now = () =>
+    new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+
+  function record(id: string, decision: Decision, reason?: string) {
+    setDecisions((prev) => ({ ...prev, [id]: { decision, reason, at: now() } }));
+    setOrder((prev) => [id, ...prev]);
+    setReasonFor(null);
+    setReasonText("");
+    // The card leaves the pending list — move focus to the decision log so the
+    // recorded outcome is the next thing keyboard/SR users land on.
+    requestAnimationFrame(() => logRef.current?.focus());
+  }
+
+  function openReason(e: React.MouseEvent<HTMLButtonElement>, id: string, kind: ReasonKind) {
+    triggerRef.current = e.currentTarget;
+    setReasonFor({ id, kind });
+    setReasonText("");
+  }
+
+  function cancelReason() {
+    setReasonFor(null);
+    setReasonText("");
+    requestAnimationFrame(() => triggerRef.current?.focus());
   }
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3 text-sm">
         <Stat label="Pending review" value={pending.length} />
-        <Stat label="Approved (session)" value={Object.values(decisions).filter((d) => d === "APPROVED").length} tone="success" />
-        <Stat label="Rejected / returned" value={Object.values(decisions).filter((d) => d !== "APPROVED").length} tone="danger" />
+        <Stat label="Approved (session)" value={recorded.filter((d) => d.decision === "APPROVED").length} tone="success" />
+        <Stat label="Rejected / returned" value={recorded.filter((d) => d.decision !== "APPROVED").length} tone="danger" />
       </div>
 
       {pending.length === 0 ? (
         <Card className="p-10 text-center">
-          <CircleCheck className="mx-auto size-8 text-[var(--color-success)]" />
+          <ClipboardCheckIllustration className="mx-auto" />
           <p className="mt-2 font-medium text-fg">Queue clear</p>
-          <p className="text-sm text-muted">Every submission has a recorded decision. Nothing self-publishes.</p>
+          <p className="text-sm text-muted">
+            Every submission has a recorded decision. Nothing self-publishes.
+            {decided[0] ? ` Last decision recorded ${decided[0].d.at}.` : ""}
+          </p>
+          <div className="mt-4 flex justify-center">
+            <Link href="/admin/audit" className={buttonVariants({ variant: "secondary" })}>
+              View audit log
+            </Link>
+          </div>
         </Card>
       ) : (
         pending.map((s) => {
           const delta = s.benchmark ? ((s.priceUGXPerKg - s.benchmark.value) / s.benchmark.value) * 100 : null;
           const bigDelta = delta != null && Math.abs(delta) > 40;
+          const formOpen = reasonFor?.id === s.id;
           return (
             <Card key={s.id} className="p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -84,11 +135,11 @@ export function VerificationQueue() {
                 {s.benchmark ? (
                   <span className="text-muted">
                     External cross-check:{" "}
-                    <span className="text-fg">{s.benchmark.value.toLocaleString()} UGX/kg</span> ·{" "}
+                    <span className="text-fg">UGX {s.benchmark.value.toLocaleString()}/kg</span> ·{" "}
                     {s.benchmark.source} · {s.benchmark.date} ·{" "}
                     <span className={cn("font-medium", bigDelta ? "text-[var(--color-danger)]" : "text-[var(--color-success)]")}>
-                      {delta! >= 0 ? "+" : ""}
-                      {delta!.toFixed(0)}% vs submitted
+                      submitted {delta! >= 0 ? "+" : "−"}
+                      {Math.abs(delta!).toFixed(0)}% vs benchmark
                     </span>
                   </span>
                 ) : (
@@ -98,22 +149,130 @@ export function VerificationQueue() {
 
               {/* Decision */}
               <div className="mt-3 flex flex-wrap gap-2 border-t border-[var(--color-border)] pt-3">
-                <Button size="sm" onClick={() => decide(s.id, "APPROVED")}>
+                <Button size="sm" onClick={() => record(s.id, "APPROVED")}>
                   <Check className="size-4" /> Approve &amp; publish
                 </Button>
-                <Button size="sm" variant="secondary" onClick={() => decide(s.id, "RETURNED")}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  aria-expanded={formOpen && reasonFor?.kind === "RETURNED"}
+                  onClick={(e) => openReason(e, s.id, "RETURNED")}
+                >
                   <RotateCcw className="size-4" /> Return for correction
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => decide(s.id, "REJECTED")}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  aria-expanded={formOpen && reasonFor?.kind === "REJECTED"}
+                  onClick={(e) => openReason(e, s.id, "REJECTED")}
+                >
                   <X className="size-4" /> Reject
                 </Button>
                 <span className="ml-auto self-center text-[11px] text-muted">
-                  Reject / return records a mandatory reason &amp; notifies the officer.
+                  Reject / return requires a recorded reason; decisions are listed below.
                 </span>
               </div>
+
+              {/* Mandatory reason (FR-ADM-07) — the decision cannot commit without it */}
+              {formOpen && reasonFor && (
+                <form
+                  className="mt-3 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface-2 p-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const reason = reasonText.trim();
+                    if (reason) record(s.id, reasonFor.kind, reason);
+                  }}
+                >
+                  <label htmlFor={`reason-${s.id}`} className="block text-sm font-medium text-fg">
+                    {reasonFor.kind === "REJECTED" ? "Reason for rejection" : "Reason for return"}{" "}
+                    <span aria-hidden className="text-[var(--color-danger)]">*</span>
+                  </label>
+                  <p className="mt-0.5 text-xs text-muted">
+                    Required. Recorded with the decision; in production the submitting officer is notified.
+                  </p>
+                  <textarea
+                    id={`reason-${s.id}`}
+                    required
+                    autoFocus
+                    rows={2}
+                    value={reasonText}
+                    onChange={(e) => setReasonText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        e.preventDefault();
+                        cancelReason();
+                      }
+                    }}
+                    placeholder={
+                      reasonFor.kind === "REJECTED"
+                        ? "e.g. Price implausible for this market and period"
+                        : "e.g. Photo of the market board is missing — please re-capture"
+                    }
+                    className="mt-2 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface p-2.5 text-base text-fg placeholder:text-muted focus-visible:border-ring"
+                  />
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Button
+                      type="submit"
+                      variant={reasonFor.kind === "REJECTED" ? "danger" : "secondary"}
+                      disabled={reasonText.trim().length === 0}
+                    >
+                      {reasonFor.kind === "REJECTED" ? "Record rejection" : "Record return"}
+                    </Button>
+                    <Button type="button" variant="ghost" onClick={cancelReason}>
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              )}
             </Card>
           );
         })
+      )}
+
+      {/* Session decision log — reasons stay visible (FR-ADM-07/13) */}
+      {decided.length > 0 && (
+        <section
+          ref={logRef}
+          tabIndex={-1}
+          aria-label="Decisions this session"
+          aria-live="polite"
+          className="space-y-2 outline-none"
+        >
+          <h2 className="text-sm font-semibold text-fg">Decisions this session</h2>
+          <Card className="p-0">
+            {decided.map(({ s, d }) => (
+              <div
+                key={s.id}
+                className="flex flex-wrap items-start justify-between gap-2 border-b border-[var(--color-border)] px-4 py-3 last:border-0"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="font-medium text-fg">
+                      {s.commodity} · {s.market}
+                    </span>
+                    <Badge variant="neutral">{s.id}</Badge>
+                    <Badge
+                      variant={
+                        d.decision === "APPROVED" ? "success" : d.decision === "REJECTED" ? "danger" : "warning"
+                      }
+                    >
+                      {DECISION_LABEL[d.decision]}
+                    </Badge>
+                  </div>
+                  {d.reason && (
+                    <p className="mt-1 text-sm text-muted">
+                      Reason: <span className="text-fg">{d.reason}</span>
+                    </p>
+                  )}
+                </div>
+                <span className="text-xs text-muted">Recorded {d.at}</span>
+              </div>
+            ))}
+          </Card>
+          <p className="text-xs text-muted">
+            Session-only demo state — a production decision also writes an audit entry and notifies the officer.
+          </p>
+        </section>
       )}
     </div>
   );

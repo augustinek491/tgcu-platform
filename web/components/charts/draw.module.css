@@ -1,0 +1,49 @@
+/*
+ * Chart motion (06 H.2, ratified §9.5):
+ *  – .draw  → chart draw-in, 400ms once on mount. H.2 sanctions
+ *    "stroke-dashoffset / opacity" for this row; the static plots stretch via
+ *    preserveAspectRatio="none" + non-scaling-stroke, where dash units resolve
+ *    in screen space and would truncate the line — so they use the opacity
+ *    variant. The Recharts island does true dashoffset drawing internally.
+ *  – The animation only arms once <DrawIn> confirms a VISIBLE document
+ *    (`data-draw="run"`): the server paint is always the final chart, so LCP,
+ *    screenshots, hidden tabs and no-JS all see complete lines.
+ *  – .fade  → delta/number update, 240ms opacity tween (interaction-driven).
+ * `--dur-draw` / `--dur-status` come from the token layer, which already zeroes
+ * them under `prefers-reduced-motion`; the media query below is belt-and-braces
+ * so the final state always renders instantly.
+ */
+[data-draw="run"] .draw {
+  animation: chart-draw var(--dur-draw, 400ms) var(--ease-out, ease-out) both;
+}
+
+@keyframes chart-draw {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade {
+  animation: value-fade var(--dur-status, 240ms) var(--ease-out, ease-out);
+}
+
+@keyframes value-fade {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-draw="run"] .draw {
+    animation: none;
+  }
+  .fade {
+    animation: none;
+  }
+}

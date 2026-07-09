@@ -31,7 +31,7 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           defaultValue="secretariat@tgcu.org"
-          className="h-11 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 text-sm outline-none focus-visible:border-[var(--color-primary)]"
+          className="h-11 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 text-base focus-visible:border-ring"
         />
       </div>
       <div className="space-y-1.5">
@@ -43,7 +43,7 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           defaultValue="demo-password"
-          className="h-11 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 text-sm outline-none focus-visible:border-[var(--color-primary)]"
+          className="h-11 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 text-base focus-visible:border-ring"
         />
       </div>
       <Button type="submit" size="lg" className="w-full" disabled={loading}>
