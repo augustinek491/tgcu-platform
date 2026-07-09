@@ -11,7 +11,6 @@ web/out/
 functions/lib/
 /build
 *.tsbuildinfo
-web/next-env.d.ts
 
 # ── Firebase ──────────────────────────────────────────────────
 .firebase/
