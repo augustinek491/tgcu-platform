@@ -20,6 +20,7 @@ const FOOTER_COLUMNS: { title: string; links: { label: string; href: string }[] 
   {
     title: "Membership",
     links: [
+      { label: "About & governance", href: "/about" },
       { label: "Membership tiers", href: "/pricing" },
       { label: "Sign in", href: "/login" },
     ],
@@ -43,6 +44,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             <LogoWordmark />
           </Link>
           <nav className="flex items-center gap-2">
+            <Link
+              href="/about"
+              className="hidden min-h-11 items-center px-3 text-sm font-medium text-muted hover:text-fg sm:inline-flex"
+            >
+              About
+            </Link>
             <Link
               href="/pricing"
               className="hidden min-h-11 items-center px-3 text-sm font-medium text-muted hover:text-fg sm:inline-flex"

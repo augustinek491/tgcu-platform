@@ -62,7 +62,7 @@ const modules = [
   {
     icon: Users,
     title: "Membership & Identity",
-    body: "One system of record for 400+ member organisations — tiers, dues and defaulter management, replacing scattered spreadsheets.",
+    body: "One system of record for over 171 member organisations — tiers, dues and defaulter management, replacing scattered spreadsheets.",
   },
   {
     icon: LineChart,
@@ -82,7 +82,7 @@ const modules = [
 ];
 
 const trustRow = [
-  "400+ member organisations",
+  "Over 171 member organisations",
   "Monthly prices with provenance",
   "Escrow-backed member trade",
 ];
@@ -165,9 +165,9 @@ export default function LandingPage() {
           </h2>
           <div className="mt-6 grid gap-8 md:grid-cols-3 md:gap-0 md:divide-x md:divide-[var(--color-border)]">
             <AuthorityFact
-              value="400+"
+              value="171+"
               label="Member organisations across Uganda's grain value chain"
-              source="TGCU · 2026"
+              source="TGCU Corporate Profile · 2024"
               className="md:pr-8"
             />
             <AuthorityFact

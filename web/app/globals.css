@@ -19,7 +19,7 @@
   --brand-300: #86efac;
 
   /* Gold / grain */
-  --gold-arc: #e9b84a;
+  --gold-arc: #f8c832; /* official logo gold crescent — sampled from the TGCU Corporate Profile 2024 asset; decorative stroke only (no text uses this token, so contrast-safe) */
   --grain-700: #b45309;
   --grain-500: #ca8a04; /* accent / CTA */
   --grain-300: #fcd34d;
