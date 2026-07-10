@@ -19,7 +19,7 @@ export default function MarketplacePage() {
         <div>
           <h1 className="font-display text-[28px] font-semibold text-fg">Grain marketplace</h1>
           <p className="mt-1 text-sm text-muted">
-            Verified members trade maize, beans, rice &amp; sorghum. Escrow protects both sides.
+            Registered members trade maize, beans, rice &amp; sorghum — verified badges mark completed KYC. Escrow protects both sides.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -60,7 +60,7 @@ export default function MarketplacePage() {
 
       <MarketplaceBrowse />
 
-      <p className="text-xs text-muted">
+      <p className="max-w-[72ch] text-xs text-muted">
         Grades are self-declared by sellers, not lab-certified. Reference prices are monthly wholesale
         figures with provenance shown. No real funds move in this demo (sandbox). Not financial advice ·
         Demo data.

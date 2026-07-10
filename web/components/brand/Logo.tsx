@@ -107,12 +107,12 @@ export function LogoWordmark({
 }) {
   const onBrand = tone === "onBrand";
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
+    <span className={cn("inline-flex items-center gap-2", className)}>
       <LogoMark size={markSize} />
       <span className="leading-tight">
         <span
           className={cn(
-            "block font-display text-[15px] font-semibold tracking-tight",
+            "block font-display text-sm font-semibold tracking-tight",
             onBrand ? "text-white" : "text-brand-800 dark:text-brand-600",
           )}
         >

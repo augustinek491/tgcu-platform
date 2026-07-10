@@ -110,6 +110,7 @@ export default function DashboardPage() {
           subtitle="Biggest month-over-month changes"
           rows={moverRows}
           footerHref="/market"
+          emptyAction={{ href: "/market", label: "Open market data →" }}
           asOf={asOfLabel}
           sources={moverSources}
         />

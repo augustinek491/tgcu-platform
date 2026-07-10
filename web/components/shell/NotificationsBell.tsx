@@ -95,7 +95,7 @@ export function NotificationsBell() {
                   <Link
                     href={n.href}
                     onClick={() => setOpen(false)}
-                    className="block min-h-11 px-4 py-2.5 transition-colors duration-[var(--dur-fast)] hover:bg-surface-2 focus-visible:bg-surface-2"
+                    className="block min-h-11 px-4 py-3 transition-colors duration-[var(--dur-fast)] hover:bg-surface-2 focus-visible:bg-surface-2"
                   >
                     <span className="flex items-baseline justify-between gap-2">
                       <span className="text-sm font-medium text-fg">{n.title}</span>

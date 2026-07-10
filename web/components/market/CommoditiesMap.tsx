@@ -122,7 +122,7 @@ export function CommoditiesMap({
 
             {/* Theme-true legend: ramp swatches + UGX/kg ticks + "Not reporting"
                 hatch (AM-31 — the swatches carry the meaning, never "darker = higher") */}
-            <div className="mt-3 flex flex-wrap items-end gap-x-5 gap-y-2 text-xs text-muted">
+            <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-2 text-xs text-muted">
               <div>
                 <span className="mb-1 block">Latest price (UGX/kg)</span>
                 <div className="flex items-center" aria-hidden="true">

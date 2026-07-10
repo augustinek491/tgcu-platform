@@ -87,7 +87,7 @@ export function DuesCard({ invoices }: { invoices: Invoice[] }) {
                       {state === "success" && "Paid"}
                     </span>
                   ) : (
-                    <Button size="sm" onClick={() => pay(inv)} disabled={!!active}>
+                    <Button onClick={() => pay(inv)} disabled={!!active}>
                       <Smartphone className="size-4" /> Pay
                     </Button>
                   ))}

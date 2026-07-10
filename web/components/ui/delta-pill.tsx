@@ -25,9 +25,11 @@ export function DeltaPill({
     <span
       className={cn(
         "tabular inline-flex items-center gap-1 rounded-[var(--radius-pill)] px-2 py-0.5 text-xs font-medium",
+        // §9.1/AM-04 badge steps on tints (A11Y-R3-02: the *-text steps measure 4.37
+        // on the 10% tint; the *-badge-text steps are the on-tint pairs, ≥5.8 both themes)
         good
-          ? "bg-[var(--color-success)]/10 text-success-text"
-          : "bg-[var(--color-danger)]/10 text-danger-text",
+          ? "bg-[var(--color-success)]/10 text-[var(--success-badge-text)]"
+          : "bg-[var(--color-danger)]/10 text-[var(--danger-badge-text)]",
         className,
       )}
     >

@@ -102,6 +102,8 @@
   --radius-pill: 999px;
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04);
   --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.12);
+  /* Single-series area fill — EFFECTIVE alpha per §9.10 (0.20 light / 0.16 dark; DM3-04) */
+  --trend-fill-alpha: 0.2;
 
   /* Motion (06 PART H.2 table + AM-13/AM-14) — durations per interaction, transform/opacity-first */
   --dur-fast: 150ms; /* button/row hover: color/bg/border */
@@ -129,9 +131,13 @@
   /* Primary fill: --brand-800 (white text ≈ 7.1:1) — brand-600 was 3.43:1, the AF-4 trigger (DM-04/A11Y-05) */
   --color-primary: var(--brand-800);
   --color-primary-hover: var(--brand-700); /* white ≈ 5.0:1 */
-  /* Dark cards separate by border + one surface step — NO shadows (06 H.1 / §0; DM-01) */
-  --shadow-card: none;
+  /* Dark cards separate by border + one surface step — NO shadows (06 H.1 / §0; DM-01).
+     §9.10: shadow tokens never resolve to keyword `none` — inside Tailwind's composed
+     box-shadow list it invalidates the whole declaration and deletes co-located rings
+     (DM3-01: the /pricing gold ring vanished in dark). 0 0 #0000 is a valid no-op. */
+  --shadow-card: 0 0 #0000;
   --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.5);
+  --trend-fill-alpha: 0.16; /* §9.10 effective alpha, dark */
   /* Dark-safe semantic text (DS §9.1) — 400-series ramps, ≥4.5:1 on --surface and --bg (DM-05/A11Y-01) */
   --success-text: #4ade80;
   --danger-text: #f87171;

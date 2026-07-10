@@ -69,7 +69,7 @@ export default function AuditPage() {
           </div>
         </CardContent>
       </Card>
-      <p className="text-xs text-muted">
+      <p className="max-w-[72ch] text-xs text-muted">
         Tamper-evident (server-only writes, deny update/delete), not cryptographically tamper-proof
         without a WORM export or hash-chain.
       </p>

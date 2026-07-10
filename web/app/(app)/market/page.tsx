@@ -111,7 +111,7 @@ export default function MarketPage() {
           p-5/gap-3: default card padding — not a dense surface (LAY-10 / DS §9.3). */}
       <div className="flex items-start gap-3 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-surface-2 p-5 text-sm text-muted">
         <Info className="mt-0.5 size-4 shrink-0" />
-        <p>
+        <p className="max-w-[72ch]">
           v1 shows <span className="font-medium text-fg">historical data and seasonal context only</span> —
           no price forecasts. Model-driven forecasting arrives in a later release, limited to
           well-covered markets with backtested intervals, and is always{" "}

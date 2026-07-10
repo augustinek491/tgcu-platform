@@ -124,7 +124,7 @@ export default function LandingPage() {
                 View membership tiers
               </Link>
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2">
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
               {trustRow.map((item) => (
                 <li key={item} className="flex items-center gap-1.5 text-sm text-muted">
                   <Check className="size-4 shrink-0 text-brand-700 dark:text-brand-300" aria-hidden />
@@ -159,7 +159,8 @@ export default function LandingPage() {
         style={{ "--lp-step": 1 } as CSSProperties}
       >
         <div className="mx-auto w-full max-w-[1280px] px-6 py-12 md:py-16">
-          <h2 id="authority-heading" className="text-sm font-semibold tracking-[0.02em] text-muted">
+          {/* Eyebrow = SANS 12/600 tracked (§9.10; TYP-R3-01 — h1/h2/h3 default to serif in globals) */}
+          <h2 id="authority-heading" className="font-sans text-xs font-semibold uppercase tracking-[0.08em] text-muted">
             The institution
           </h2>
           <div className="mt-6 grid gap-8 md:grid-cols-3 md:gap-0 md:divide-x md:divide-[var(--color-border)]">
@@ -182,7 +183,7 @@ export default function LandingPage() {
               className="md:pl-8"
             />
           </div>
-          <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-[var(--color-border)] pt-5">
+          <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-[var(--color-border)] pt-6">
             <Badge variant="warning">Demo · seeded data</Badge>
             <p className="text-xs text-muted">
               This demonstration runs on seeded records: {orgs.length} member organisations
@@ -225,7 +226,7 @@ export default function LandingPage() {
             </p>
             <Link
               href="/pricing"
-              className="mt-5 inline-flex min-h-11 items-center gap-1 text-sm font-medium text-brand-interactive hover:underline lg:min-h-0"
+              className="mt-6 inline-flex min-h-11 items-center gap-1 text-sm font-medium text-brand-interactive hover:underline lg:min-h-0"
             >
               See what each tier unlocks <ArrowRight className="size-4" aria-hidden />
             </Link>
@@ -239,7 +240,7 @@ export default function LandingPage() {
         className="lp-reveal mx-auto w-full max-w-[1280px] px-6 pb-section-sm"
         style={{ "--lp-step": 3 } as CSSProperties}
       >
-        <h2 id="modules-heading" className="text-sm font-semibold tracking-[0.02em] text-muted">
+        <h2 id="modules-heading" className="font-sans text-xs font-semibold uppercase tracking-[0.08em] text-muted">
           What the platform does
         </h2>
         <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -247,11 +248,15 @@ export default function LandingPage() {
             const Icon = m.icon;
             return (
               <Card key={m.title} className="p-6">
-                <div className="mb-4 grid size-11 place-items-center rounded-[var(--radius-sm)] bg-brand-800/10 text-brand-700 dark:bg-brand-600/15 dark:text-brand-300">
+                <div
+                  aria-hidden
+                  className="mb-4 grid size-11 place-items-center rounded-[var(--radius-sm)] bg-brand-800/10 text-brand-700 dark:bg-brand-600/15 dark:text-brand-300"
+                >
                   <Icon className="size-5" />
                 </div>
-                <h3 className="font-display text-xl font-semibold text-fg">{m.title}</h3>
-                <p className="mt-2 text-sm text-muted">{m.body}</p>
+                <h3 className="font-display text-xl font-medium text-fg">{m.title}</h3>
+                {/* ≥16px at mobile per DS §3 (TYP-R3-06); 14px from md up */}
+                <p className="mt-2 text-base text-muted md:text-sm">{m.body}</p>
               </Card>
             );
           })}

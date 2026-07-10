@@ -123,7 +123,7 @@ export function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
         {/* Logo mark at the top of the drawer (AM-25), aligned to topbar height. */}
         <div className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-4 md:h-16 dark:border-brand-800">
           <LogoMark size={28} />
-          <span className="font-display text-sm font-semibold tracking-tight text-fg">TGCU</span>
+          <span className="font-display text-xl font-semibold tracking-tight text-fg">TGCU</span>
           <Button
             variant="ghost"
             size="icon"

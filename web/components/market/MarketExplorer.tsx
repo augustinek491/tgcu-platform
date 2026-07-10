@@ -173,8 +173,10 @@ export function MarketExplorer({
               className={cn(
                 // Selected chip = AM-05: series-tinted bg + series border + --fg text +
                 // series dot — the dot/border keep the chip↔series color key honest.
-                // ::after = invisible 44px hit-area (A11Y-R2-12); visual pill unchanged.
-                "relative inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border px-2.5 py-1 text-xs font-medium transition-colors after:absolute after:inset-x-0 after:-inset-y-2.5",
+                // §9.10 effective-target rule (A11Y-R3-06): wrapped rows annihilate big
+                // pseudo-extensions, so the chip carries REAL pitch — min-h-9 (36px)
+                // + row gap 8 = 44px pitch; ::after ±4px bridges the gap.
+                "relative inline-flex min-h-9 items-center gap-1.5 rounded-[var(--radius-pill)] border px-2.5 py-1 text-xs font-medium transition-colors after:absolute after:inset-x-0 after:-inset-y-1",
                 on
                   ? "text-fg"
                   : "border-[var(--color-border)] text-muted hover:bg-surface-2",
@@ -409,7 +411,7 @@ export function MarketExplorer({
                 </div>
               }
             />
-            <p className="pt-3 text-xs text-muted">
+            <p className="max-w-[72ch] pt-3 text-xs text-muted">
               Markets differ — spatial price spread like this is typical · seeded demo values · as
               of {comparisonAsOf} · {commodity.source}
             </p>

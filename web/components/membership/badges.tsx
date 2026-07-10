@@ -14,11 +14,13 @@ export function TierBadge({ tierId, className }: { tierId: TierId; className?: s
       )}
       // Text = tier text-safe pair (DS §9.1 / AM-04); gold-family tints ≤10% (ratified
       // 2026-07-10): gold 10% → 4.55:1, bronze (amber fill, darker) needs 7% → 4.57:1.
+      // §9.10 worst-backdrop rule: mix against --color-surface (not transparent) so the
+      // pair is placement-independent — on --bg the transparent mix measured 4.37 (DM3-02).
       style={{
         color: `var(--tier-${tier.id}-text)`,
         background: `color-mix(in srgb, ${tier.accentVar} ${
           tier.id === "gold" ? 10 : tier.id === "bronze" ? 7 : 14
-        }%, transparent)`,
+        }%, var(--color-surface))`,
       }}
     >
       <span className="size-1.5 rounded-full" style={{ background: tier.accentVar }} />

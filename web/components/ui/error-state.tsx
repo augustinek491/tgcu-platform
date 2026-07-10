@@ -46,7 +46,7 @@ export function ErrorState({
         </a>
       </div>
       {digest && (
-        <p className="mt-4 font-mono text-xs text-muted">Reference: {digest}</p>
+        <p className="mt-4 text-xs text-muted">Reference: {digest}</p>
       )}
     </div>
   );

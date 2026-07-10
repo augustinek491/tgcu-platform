@@ -236,6 +236,10 @@
 
 .mapShell :global(.maplibregl-cooperative-gesture-screen) {
   font: 500 14px/1.4 var(--font-sans);
+  /* Token scrim so the "use ⌘+scroll" hint clears 4.5:1 (A11Y-R3-05) — vendor
+     default was white on ~#939392 (3.07). Dark stone-950 wash → white ≈ 15:1. */
+  background: color-mix(in srgb, #0c0a09 62%, transparent);
+  color: #fff;
 }
 
 /* Canvas keyboard focus — draw the ring inside the clipped shell */

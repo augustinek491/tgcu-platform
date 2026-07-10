@@ -53,6 +53,7 @@ export function MoversCard({
   rows,
   footerHref,
   footerLabel = "View all movers →",
+  emptyAction,
   asOf,
   sources,
 }: {
@@ -61,6 +62,9 @@ export function MoversCard({
   rows: MoverRow[];
   footerHref?: string;
   footerLabel?: string;
+  /** Empty-state exit — omit or self-referential hrefs are avoided by the caller
+   *  (CON-R3-03: on /market it pointed /market→/market). */
+  emptyAction?: { href: string; label: string };
   asOf: string;
   sources: string;
 }) {
@@ -106,25 +110,27 @@ export function MoversCard({
           /* A.11/A.7 empty state — illustration + 16/600 headline + action */
           <div className="py-6 text-center">
             <WheatSheafIllustration size={64} className="mx-auto" />
-            <p className="mt-2 text-base font-semibold text-fg">
+            <p className="mt-2 text-base font-medium text-fg">
               No {dir === "up" ? "rising" : "falling"} movers this month
             </p>
             <p className="mt-1 text-sm text-muted">
               Movers derive from reporting markets only — nothing is fabricated.
             </p>
-            <Link
-              href="/market"
-              className="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-brand-interactive hover:underline"
-            >
-              Open market data →
-            </Link>
+            {emptyAction && (
+              <Link
+                href={emptyAction.href}
+                className="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-brand-interactive hover:underline"
+              >
+                {emptyAction.label}
+              </Link>
+            )}
           </div>
         ) : (
           <ul className="space-y-1">
             {shown.map((r) => (
               <li
                 key={r.key}
-                className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] px-2 py-2 transition-colors duration-[var(--dur-fast)] hover:bg-surface-2"
+                className="flex min-h-[60px] items-center justify-between gap-3 rounded-[var(--radius-sm)] px-2 py-2 transition-colors duration-[var(--dur-fast)] hover:bg-surface-2"
               >
                 <span className="min-w-0 truncate text-sm font-medium text-fg">{r.label}</span>
                 {/* Mini sparkline (A.7/DV-R2-01) — decorative; the value + pill

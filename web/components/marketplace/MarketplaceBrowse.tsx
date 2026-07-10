@@ -86,7 +86,7 @@ export function MarketplaceBrowse() {
       {/* Filter rail */}
       <aside className="space-y-6">
         <div className="flex items-center justify-between">
-          <span className="font-display text-sm font-semibold text-fg">Filters</span>
+          <span className="text-sm font-semibold text-fg">Filters</span>
           <button
             onClick={clear}
             className="inline-flex min-h-11 items-center px-2 text-xs text-brand-interactive hover:underline lg:min-h-0 lg:px-0"
@@ -203,9 +203,10 @@ function Segmented<T extends string>({
         <button
           key={o.v}
           onClick={() => onChange(o.v)}
+          aria-pressed={value === o.v}
           className={cn(
             // min-h-11 = 44px touch target <lg (MOB-03); desktop keeps the compact control.
-            "min-h-11 flex-1 px-2 py-1.5 text-xs font-medium transition-colors lg:min-h-0",
+            "min-h-11 flex-1 px-2 py-2 text-xs font-medium transition-colors lg:min-h-0",
             value === o.v ? "bg-brand-800 text-white" : "text-muted hover:bg-surface-2",
           )}
         >
@@ -228,11 +229,12 @@ function Radio({
   labelFor: (v: string) => string;
 }) {
   return (
-    <div className="space-y-0.5">
+    <div className="space-y-1">
       {options.map((o) => (
         <button
           key={o}
           onClick={() => onChange(o)}
+          aria-pressed={value === o}
           className={cn(
             "flex min-h-11 w-full items-center rounded-[var(--radius-sm)] px-2 py-1 text-left text-sm transition-colors lg:min-h-0",
             value === o ? "bg-brand-800/10 font-medium text-brand-800 dark:bg-brand-600/15 dark:text-brand-300" : "text-muted hover:bg-surface-2",

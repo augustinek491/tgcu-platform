@@ -25,9 +25,10 @@ function NavLink({
         // h-11 = 44px row, px-4 = 16px item padding per 06 A.3 ("item h44, px-16").
         "flex h-11 items-center gap-3 rounded-[var(--radius-sm)] px-4 text-sm font-medium transition-colors duration-[var(--dur-fast)]",
         active
-          ? // Active: brand-interactive text (brand-700/brand-300, DS §9.1) + tint;
+          ? // Active: light takes brand-800 — brand-interactive (brand-700) measures 4.28
+            // on the active tint (A11Y-R3-03; §9.10 worst-backdrop rule). Dark stays brand-300.
             // dark = brand-600 @20% + 3px --grain-500 accent bar (06 A.3/H.1, DM-02).
-            "nav-item-active bg-brand-800/10 text-brand-interactive dark:bg-brand-600/20"
+            "nav-item-active bg-brand-800/10 text-brand-800 dark:bg-brand-600/20 dark:text-brand-300"
           : "text-muted hover:bg-surface-2 hover:text-fg dark:text-sidebar-muted dark:hover:bg-[var(--color-border)]/40 dark:hover:text-fg",
       )}
     >
@@ -85,7 +86,7 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
       {/* px-6/gap-3 on-token (LAY-06/07; A.2 shell bars px-24) */}
       <div className="flex h-16 items-center gap-3 border-b border-[var(--color-border)] px-6 dark:border-brand-800">
         <LogoMark size={28} />
-        <span className="font-display text-sm font-semibold tracking-tight text-fg">TGCU</span>
+        <span className="font-display text-xl font-semibold tracking-tight text-fg">TGCU</span>
       </div>
       <ShellNav isAdmin={isAdmin} />
       <div className="border-t border-[var(--color-border)] p-4 text-xs text-muted dark:border-brand-800 dark:text-sidebar-muted">

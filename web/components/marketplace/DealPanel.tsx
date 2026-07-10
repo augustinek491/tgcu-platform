@@ -138,20 +138,20 @@ export function DealPanel({ deal: initial }: { deal: Deal }) {
           <div className="flex flex-wrap gap-2">
             {state === "in_transit" && (
               <>
-                <Button size="sm" variant="secondary" className="h-11 lg:h-9" onClick={markDelivered}>
+                <Button size="sm" variant="secondary" className="h-11" onClick={markDelivered}>
                   <Truck className="size-4" /> Mark delivered (transporter)
                 </Button>
-                <Button size="sm" variant="ghost" className="h-11 lg:h-9" onClick={raiseDispute}>
+                <Button size="sm" variant="ghost" className="h-11" onClick={raiseDispute}>
                   Raise dispute
                 </Button>
               </>
             )}
             {state === "delivered" && (
               <>
-                <Button size="sm" className="h-11 lg:h-9" onClick={confirmRelease}>
+                <Button size="sm" className="h-11" onClick={confirmRelease}>
                   <Check className="size-4" /> Confirm delivery & release
                 </Button>
-                <Button size="sm" variant="ghost" className="h-11 lg:h-9" onClick={raiseDispute}>
+                <Button size="sm" variant="ghost" className="h-11" onClick={raiseDispute}>
                   Raise dispute
                 </Button>
               </>
@@ -162,10 +162,10 @@ export function DealPanel({ deal: initial }: { deal: Deal }) {
                   <AlertTriangle className="size-4" /> Escrow frozen · admin resolution
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <Button size="sm" variant="secondary" className="h-11 lg:h-9" onClick={resolveRelease}>
+                  <Button size="sm" variant="secondary" className="h-11" onClick={resolveRelease}>
                     Release to seller
                   </Button>
-                  <Button size="sm" variant="secondary" className="h-11 lg:h-9" onClick={resolveRefund}>
+                  <Button size="sm" variant="secondary" className="h-11" onClick={resolveRefund}>
                     Refund buyer
                   </Button>
                 </div>

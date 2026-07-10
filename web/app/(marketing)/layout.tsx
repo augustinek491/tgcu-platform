@@ -62,7 +62,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
 
       <footer className="border-t border-[var(--color-border)] bg-surface">
         <div className="mx-auto w-full max-w-[1280px] px-6 py-12 md:py-16">
-          <div className="grid gap-10 md:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] md:gap-8">
+          <div className="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] md:gap-8">
             <div>
               <LogoWordmark />
               <p className="mt-4 max-w-xs text-sm text-muted">
@@ -79,7 +79,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
                       <Link
                         href={link.href}
                         // ::after = invisible 44px hit-area (MOB-02) — visual link unchanged.
-                        className="relative inline-block py-1 text-sm text-muted hover:text-fg after:absolute after:inset-x-0 after:-inset-y-2"
+                        className="relative inline-flex min-h-11 items-center text-sm text-muted hover:text-fg"
                       >
                         {link.label}
                       </Link>
@@ -90,7 +90,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             ))}
           </div>
 
-          <div className="mt-10 border-t border-[var(--color-border)] pt-6">
+          <div className="mt-12 border-t border-[var(--color-border)] pt-6">
             <address className="text-sm not-italic text-muted">
               The Grain Council of Uganda · Plot 35 Kenneth Dale, Kamwokya, Kampala ·{" "}
               <a href="tel:+256393517499" className="hover:text-fg">

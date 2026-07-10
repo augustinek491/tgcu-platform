@@ -78,6 +78,15 @@ export function PriceTrendChart({
   const single = markets.length === 1;
   const endLabels = smUp && !single;
 
+  // Recharts spreads `tick` onto its <text>; SVG wants the hyphenated presentation
+  // attribute for tabular figures (TYP-R3-02). Cast bypasses the camelCase-only prop type.
+  const TICK = {
+    fontSize: 12,
+    fill: "var(--color-muted)",
+    fontFamily: "var(--font-sans)",
+    "font-variant-numeric": "tabular-nums",
+  } as React.SVGProps<SVGTextElement>;
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ComposedChart
@@ -85,22 +94,25 @@ export function PriceTrendChart({
         margin={{ top: 16, right: endLabels ? 64 : 12, bottom: 0, left: -8 }}
       >
         <defs>
+          {/* §9.10: EFFECTIVE alpha 0.20 light / 0.16 dark — Recharts multiplies the
+              Area's default fillOpacity 0.6 into the stop, so the stop carries the
+              full target via --trend-fill-alpha and the Area sets fillOpacity=1. */}
           <linearGradient id="trend-single-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--data)" stopOpacity={0.2} />
+            <stop offset="0%" stopColor="var(--data)" stopOpacity="var(--trend-fill-alpha, 0.2)" />
             <stop offset="100%" stopColor="var(--data)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid stroke="var(--color-border)" strokeOpacity={0.6} vertical={false} />
         <XAxis
           dataKey="month"
-          tick={{ fontSize: 12, fill: "var(--color-muted)", fontFamily: "var(--font-sans)" }}
+          tick={TICK}
           tickLine={false}
           minTickGap={20}
           axisLine={{ stroke: "var(--color-border)" }}
         />
         <YAxis
-          // Axis ticks are member-facing: Public Sans 12, never mono (DS §3; TYP-05)
-          tick={{ fontSize: 12, fill: "var(--color-muted)", fontFamily: "var(--font-sans)" }}
+          // Axis ticks are member-facing: Public Sans 12 tabular, never mono (DS §3; TYP-R3-02)
+          tick={TICK}
           tickLine={false}
           axisLine={false}
           width={52}
@@ -141,6 +153,7 @@ export function PriceTrendChart({
             stroke="var(--data)"
             strokeWidth={2}
             fill="url(#trend-single-fill)"
+            fillOpacity={1}
             dot={{ r: 3, fill: "var(--data)", strokeWidth: 0 }}
             activeDot={{ r: 4 }}
             connectNulls={false}
@@ -249,19 +262,21 @@ function EndLabelsLayer(props: unknown) {
   return (
     <g aria-hidden="true">
       {labels.map((l) => (
-        <text
-          key={l.key}
-          x={l.x + 6}
-          y={l.y}
-          dy={4}
-          fontSize={12}
-          fontWeight={500}
-          fill={l.color}
-          fontFamily="var(--font-sans)"
-          textAnchor="start"
-        >
-          {l.key}
-        </text>
+        <g key={l.key}>
+          <circle cx={l.x + 9} cy={l.y} r={3} fill={l.color} />
+          <text
+            x={l.x + 16}
+            y={l.y}
+            dy={4}
+            fontSize={12}
+            fontWeight={500}
+            fill="var(--color-fg)"
+            fontFamily="var(--font-sans)"
+            textAnchor="start"
+          >
+            {l.key}
+          </text>
+        </g>
       ))}
     </g>
   );

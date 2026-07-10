@@ -162,11 +162,11 @@ export function OfferDialog({
             }}
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? priceErrorId : undefined}
-            className="tabular mt-1.5 h-11 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 text-base text-fg focus:border-ring"
+            className="tabular mt-2 h-11 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 text-base text-fg focus:border-ring"
             placeholder="e.g. 1,850"
           />
           {error && (
-            <p id={priceErrorId} role="alert" className="mt-1.5 text-sm text-danger-text">
+            <p id={priceErrorId} role="alert" className="mt-2 text-sm text-danger-text">
               {error}
             </p>
           )}
@@ -179,7 +179,7 @@ export function OfferDialog({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
-            className="mt-1.5 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 py-2 text-base text-fg focus:border-ring"
+            className="mt-2 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 py-2 text-base text-fg focus:border-ring"
             placeholder={isBuy ? "e.g. Can deliver within 5 days" : "e.g. Collecting from your store"}
           />
 

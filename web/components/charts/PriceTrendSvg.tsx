@@ -157,9 +157,13 @@ export function PriceTrendSvg({
             return (
               <span
                 key={s.name}
-                className="absolute -translate-y-1/2 text-xs font-medium"
-                style={{ top: `${py(s.points[lastIdx] as number)}%`, color: s.color }}
+                className="absolute inline-flex -translate-y-1/2 items-center gap-1.5 text-xs font-medium text-fg"
+                style={{ top: `${py(s.points[lastIdx] as number)}%` }}
               >
+                <span
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ background: s.color }}
+                />
                 {s.name}
               </span>
             );

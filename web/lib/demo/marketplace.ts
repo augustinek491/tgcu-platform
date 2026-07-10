@@ -173,8 +173,11 @@ export const LISTINGS: Listing[] = [
     marketId: "gulu",
     logistics: "Buyer collects",
     // KYC level 1 in the register → renders unverified (the "Verified sellers only"
-    // filter case) — truthfully, not via an invented org.
-    seller: partyFromOrg("org_gulu_traders", { initials: "GT", deals: 0 }),
+    // filter case) — truthfully, not via an invented org. Trade-floor rule
+    // (FR-MKTPL-90): only good/grace-standing orgs may hold live listings —
+    // suspended/lapsed never appear here (Gulu Grain Traders is suspended, so a
+    // grace-standing KYC-1 handler carries the unverified showcase instead).
+    seller: partyFromOrg("org_soroti_handlers", { initials: "SH", deals: 0 }),
     createdAt: "2026-07-02",
   }),
   listing({

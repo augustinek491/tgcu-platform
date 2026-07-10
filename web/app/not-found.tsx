@@ -13,7 +13,7 @@ export default function NotFound() {
         <div className="mb-4 flex justify-center">
           <MapPinIllustration size={96} />
         </div>
-        <p className="font-display text-5xl font-semibold text-fg">404</p>
+        <h1 className="font-display text-5xl font-semibold text-fg">404</h1>
         <p className="mt-2 text-muted">That page doesn&apos;t exist.</p>
         {/* The seeded global search, scoped to the 404 (visible at every width). */}
         <div className="mt-6 text-left">
