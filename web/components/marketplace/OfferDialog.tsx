@@ -110,7 +110,7 @@ export function OfferDialog({
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 id={titleId} className="font-display text-lg font-semibold text-fg">
+            <h2 id={titleId} className="font-display text-lg font-medium text-fg">
               {initial ? "Edit your offer" : isBuy ? "Respond to buy request" : "Make an offer"}
             </h2>
             <p className="mt-0.5 text-sm text-muted">

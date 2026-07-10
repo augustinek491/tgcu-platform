@@ -29,7 +29,7 @@ export function ListingCard({
     <Card className="flex flex-col p-card-dense">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <div className="font-display text-lg font-semibold text-fg">
+          <div className="font-display text-lg font-medium text-fg">
             {mt} MT {listing.commodity}
           </div>
           <div className="text-xs text-muted">

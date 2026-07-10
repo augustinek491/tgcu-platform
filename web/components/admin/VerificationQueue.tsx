@@ -167,7 +167,7 @@ export function VerificationQueue() {
     setReasonFor(null);
     setReasonText("");
     // <1024 the panes stack (E.1) — bring the decision surface into view.
-    if (typeof window !== "undefined" && !window.matchMedia("(min-width: 1024px)").matches) {
+    if (typeof window !== "undefined" && !window.matchMedia("(min-width: 1280px)").matches) {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       requestAnimationFrame(() =>
         detailRef.current?.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" }),
@@ -212,7 +212,7 @@ export function VerificationQueue() {
   }
 
   const selectCls =
-    "h-9 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-2 text-xs text-fg focus-visible:border-ring";
+    "h-11 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-2 text-xs text-fg focus-visible:border-ring lg:h-9";
 
   return (
     <div className="space-y-4">
@@ -237,8 +237,10 @@ export function VerificationQueue() {
           </div>
         </Card>
       ) : (
-        /* E.1 master/detail: queue list minmax(320,420) + detail panel at ≥1024; stacked below. */
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(320px,420px)_minmax(0,1fr)]">
+        /* E.1 master/detail splits at xl (1280): at 1024–1279 the 256px sidebar leaves
+           only 768px content — below the 420+24+380 the split needs — so it would starve
+           the decision pane to 260px (R4 M3). Stack until xl. */
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(320px,420px)_minmax(0,1fr)]">
           <Card className="min-w-0 p-0">
             {/* E.1 toolbar (R3-L-02): compact status + commodity filters and an
                 oldest/newest sort, plus the fail-closed reminder micro-note. */}
@@ -272,7 +274,7 @@ export function VerificationQueue() {
                   type="button"
                   aria-pressed={oldestFirst}
                   onClick={() => setOldestFirst((v) => !v)}
-                  className="inline-flex h-9 items-center rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-2.5 text-xs font-medium text-fg hover:bg-surface-2"
+                  className="inline-flex h-11 items-center rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-2.5 text-xs font-medium text-fg hover:bg-surface-2 lg:h-9"
                 >
                   {oldestFirst ? "Oldest first" : "Newest first"}
                 </button>
@@ -505,14 +507,14 @@ function DetailPanel({
               <div className="space-y-2">
                 <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted">Submitted</p>
+                    <p className="text-xs uppercase tracking-wide text-muted">Submitted</p>
                     <p className="tabular text-lg font-semibold text-fg">
                       {s.priceUGXPerKg.toLocaleString()}{" "}
                       <span className="text-xs font-normal text-muted">UGX/kg</span>
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted">Trusted series</p>
+                    <p className="text-xs uppercase tracking-wide text-muted">Trusted series</p>
                     <div className="flex items-end gap-2">
                       <p className="tabular text-lg font-semibold text-fg">
                         {s.benchmark.value.toLocaleString()}{" "}
@@ -645,7 +647,7 @@ function Stat({ label, value, tone }: { label: string; value: number; tone?: "su
 /** Compact screening pill for the E.1 row (R3-L-03) — warning-tinted, one word. */
 function FlagPill({ flag }: { flag: ScreeningFlag }) {
   return (
-    <span className="inline-flex items-center rounded-[var(--radius-pill)] bg-[var(--color-warning)]/14 px-1.5 py-0.5 text-[11px] font-medium text-[var(--warning-badge-text)] dark:bg-[var(--color-warning)]/20">
+    <span className="inline-flex items-center rounded-[var(--radius-pill)] bg-[var(--color-warning)]/14 px-1.5 py-0.5 text-xs font-medium text-[var(--warning-badge-text)] dark:bg-[var(--color-warning)]/20">
       {FLAG_PILL[flag]}
     </span>
   );

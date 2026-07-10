@@ -88,7 +88,7 @@ export function ChartMaximize({ label, children }: { label: string; children: Re
             >
               <div className="flex items-center justify-between gap-3 border-b border-[var(--color-border)] p-6 py-4">
                 <h2 id={titleId} className="font-display text-lg font-medium text-fg">
-                  {label}
+                  {label} — full screen
                 </h2>
                 <button
                   ref={closeRef}

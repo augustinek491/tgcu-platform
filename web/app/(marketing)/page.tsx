@@ -185,7 +185,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-[var(--color-border)] pt-6">
             <Badge variant="warning">Demo · seeded data</Badge>
-            <p className="text-xs text-muted">
+            <p className="max-w-[72ch] text-xs text-muted">
               This demonstration runs on seeded records: {orgs.length} member organisations
               · {reportingMarkets} of {MARKETS.length} markets reporting · {MONTHS.length}{" "}
               months of monthly prices · as of {asOfLabel}.
@@ -252,7 +252,7 @@ export default function LandingPage() {
                   aria-hidden
                   className="mb-4 grid size-11 place-items-center rounded-[var(--radius-sm)] bg-brand-800/10 text-brand-700 dark:bg-brand-600/15 dark:text-brand-300"
                 >
-                  <Icon className="size-5" />
+                  <Icon className="size-5" aria-hidden />
                 </div>
                 <h3 className="font-display text-xl font-medium text-fg">{m.title}</h3>
                 {/* ≥16px at mobile per DS §3 (TYP-R3-06); 14px from md up */}

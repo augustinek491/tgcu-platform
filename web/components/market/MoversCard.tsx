@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DeltaPill } from "@/components/ui/delta-pill";
+import { Segmented } from "@/components/ui/segmented";
 import { WheatSheafIllustration } from "@/components/illustrations/empty-states";
-import { cn } from "@/lib/utils";
 
 export type MoverRow = {
   key: string;
@@ -71,23 +71,6 @@ export function MoversCard({
   const [dir, setDir] = useState<"up" | "down">("up");
   const shown = rows.filter((r) => r.delta.dir === dir).slice(0, 6);
 
-  const segment = (target: "up" | "down", text: string) => {
-    const active = dir === target;
-    return (
-      <button
-        type="button"
-        aria-pressed={active}
-        onClick={() => setDir(target)}
-        className={cn(
-          "inline-flex min-h-11 items-center px-3 text-xs font-medium transition-colors duration-[var(--dur-fast)]",
-          active ? "bg-brand-800 text-white" : "text-muted hover:bg-surface-2",
-        )}
-      >
-        {text}
-      </button>
-    );
-  };
-
   return (
     <Card className="min-w-0">
       <CardHeader className="flex-row flex-wrap items-start justify-between gap-2">
@@ -95,15 +78,19 @@ export function MoversCard({
           <CardTitle>{title}</CardTitle>
           <p className="text-sm text-muted">{subtitle}</p>
         </div>
-        {/* A.7 segmented Rising · Falling toggle */}
-        <div
-          role="group"
-          aria-label={`${title} — rising or falling`}
+        {/* A.7 segmented Rising · Falling toggle — the shared registry primitive
+            (DS §9.8/AM-24), same treatment as its three siblings. */}
+        <Segmented<"up" | "down">
+          label={`${title} — rising or falling`}
+          value={dir}
+          onChange={setDir}
           className="inline-flex overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)]"
-        >
-          {segment("up", "Rising")}
-          {segment("down", "Falling")}
-        </div>
+          optionClassName="inline-flex min-h-11 items-center px-3 text-xs font-medium duration-[var(--dur-fast)]"
+          options={[
+            { value: "up", label: "Rising" },
+            { value: "down", label: "Falling" },
+          ]}
+        />
       </CardHeader>
       <CardContent>
         {shown.length === 0 ? (
@@ -142,7 +129,7 @@ export function MoversCard({
                   width="64"
                   height="20"
                   aria-hidden="true"
-                  className="ml-auto shrink-0 text-[var(--data)] lg:hidden xl:block"
+                  className="ml-auto shrink-0 text-[var(--spark)] lg:hidden xl:block"
                 >
                   {/* stroke 2px (was 1.5): `--data` #2563EB reads 3.38:1 on the
                       resting `--surface` but only 2.94:1 once the row hovers to

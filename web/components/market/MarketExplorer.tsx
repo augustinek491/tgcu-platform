@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FreshnessIndicator } from "@/components/shell/FreshnessIndicator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Segmented } from "@/components/ui/segmented";
+import { DataTable, Thead, Tbody, Tr, Th, Td } from "@/components/ui/data-table";
 import { ChartTableSwitch } from "@/components/charts/ChartTableSwitch";
 import { ChartMaximize } from "@/components/charts/ChartMaximize";
 import { TrendDataTable } from "@/components/charts/TrendDataTable";
@@ -170,10 +171,11 @@ export function MarketExplorer({
               className={cn(
                 // Selected chip = AM-05: series-tinted bg + series border + --fg text +
                 // series dot — the dot/border keep the chip↔series color key honest.
-                // §9.10 effective-target rule (A11Y-R3-06): wrapped rows annihilate big
-                // pseudo-extensions, so the chip carries REAL pitch — min-h-9 (36px)
-                // + row gap 8 = 44px pitch; ::after ±4px bridges the gap.
-                "relative inline-flex min-h-9 items-center gap-1.5 rounded-[var(--radius-pill)] border px-2.5 py-1 text-xs font-medium transition-colors after:absolute after:inset-x-0 after:-inset-y-1",
+                // §9.10 effective-target rule (A11Y-R3-06 / MOB-R4-01): a 36px chip
+                // + ±4px pseudo-extension still measured 42px effective because the
+                // extensions collide in the 8px wrap gap. Carry REAL 44px pitch —
+                // min-h-11 — so no overlap can eat it.
+                "relative inline-flex min-h-11 items-center gap-1.5 rounded-[var(--radius-pill)] border px-2.5 py-1 text-xs font-medium transition-colors",
                 on
                   ? "text-fg"
                   : "border-[var(--color-border)] text-muted hover:bg-surface-2",
@@ -221,7 +223,7 @@ export function MarketExplorer({
                 label={`${commodity.name} price trend`}
                 actions={
                   /* A.6 maximize-2 → full-screen chart modal (DV-R2-03) */
-                  <ChartMaximize label={`${commodity.name} price trend — full screen`}>
+                  <ChartMaximize label={`${commodity.name} price trend`}>
                     <ChartTableSwitch
                       label={`${commodity.name} price trend (full screen)`}
                       chart={
@@ -348,64 +350,52 @@ export function MarketExplorer({
                 </div>
               }
               table={
-                <div className="overflow-auto rounded-[var(--radius-sm)] border border-[var(--color-border)]">
-                  <table className="w-full text-sm">
-                    <caption className="sr-only">
+                <DataTable
+                  caption={
+                    <>
                       Latest {commodity.name} wholesale price by market, UGX per kilogram;
                       non-reporting markets listed as not reporting
-                    </caption>
-                    <thead className="sticky top-0 z-10 bg-surface">
-                      <tr className="border-b border-[var(--color-border)] text-xs text-muted">
-                        <th scope="col" className="px-3 py-2 text-left font-semibold">
-                          Market
-                        </th>
-                        <th scope="col" className="px-3 py-2 text-right font-semibold">
-                          Price (UGX/kg)
-                        </th>
-                        <th scope="col" className="px-3 py-2 text-left font-semibold">
-                          Source
-                        </th>
-                        <th scope="col" className="px-3 py-2 text-left font-semibold">
-                          As of
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {bars.map((b) => (
-                        <tr
-                          key={b.market.id}
-                          className="border-b border-[var(--color-border)] last:border-0"
-                        >
-                          <th scope="row" className="px-3 py-2 text-left font-medium text-fg">
-                            {b.market.name}
-                          </th>
-                          <td className="tabular px-3 py-2 text-right text-fg">
-                            {b.latest!.price.toLocaleString()}
-                          </td>
-                          <td className="px-3 py-2 text-xs text-muted">{commodity.source}</td>
-                          <td className="tabular px-3 py-2 text-xs text-muted">
-                            {fullLabel(b.latest!.month)}
-                          </td>
-                        </tr>
-                      ))}
-                      {nonReporting.map((m) => (
-                        <tr
-                          key={m.id}
-                          className="border-b border-[var(--color-border)] last:border-0"
-                        >
-                          <th scope="row" className="px-3 py-2 text-left font-medium text-muted">
-                            {m.name}
-                          </th>
-                          <td className="px-3 py-2 text-right text-xs text-muted">
-                            not reporting
-                          </td>
-                          <td className="px-3 py-2 text-xs text-muted">—</td>
-                          <td className="px-3 py-2 text-xs text-muted">—</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    </>
+                  }
+                  containerClassName="overflow-auto rounded-[var(--radius-sm)] border border-[var(--color-border)]"
+                >
+                  <Thead>
+                    <Tr hover={false}>
+                      <Th>Market</Th>
+                      <Th align="right">Price (UGX/kg)</Th>
+                      <Th>Source</Th>
+                      <Th>As of</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {bars.map((b) => (
+                      <Tr key={b.market.id} hover={false}>
+                        <Th scope="row" className="text-sm font-medium text-fg">
+                          {b.market.name}
+                        </Th>
+                        <Td align="right" tabular className="text-fg">
+                          {b.latest!.price.toLocaleString()}
+                        </Td>
+                        <Td className="text-xs text-muted">{commodity.source}</Td>
+                        <Td tabular className="text-xs text-muted">
+                          {fullLabel(b.latest!.month)}
+                        </Td>
+                      </Tr>
+                    ))}
+                    {nonReporting.map((m) => (
+                      <Tr key={m.id} hover={false}>
+                        <Th scope="row" className="text-sm font-medium text-muted">
+                          {m.name}
+                        </Th>
+                        <Td align="right" className="text-xs text-muted">
+                          not reporting
+                        </Td>
+                        <Td className="text-xs text-muted">—</Td>
+                        <Td className="text-xs text-muted">—</Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </DataTable>
               }
             />
             <p className="max-w-[72ch] pt-3 text-xs text-muted">

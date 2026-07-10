@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Lock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DataTable, Thead, Tbody, Tr, Th, Td } from "@/components/ui/data-table";
 import { auditLog } from "@/lib/demo/admin";
 
 export const metadata: Metadata = { title: "Audit log" };
@@ -35,38 +36,31 @@ export default function AuditPage() {
 
       <Card>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm" style={{ fontFamily: "var(--font-mono)" }}>
-              <thead>
-                <tr className="border-b border-[var(--color-border)] text-left">
-                  {["Time", "Actor", "Role", "Action", "Entity", "Detail"].map((h) => (
-                    <th key={h} className="whitespace-nowrap px-4 py-3 font-medium text-muted">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {auditLog.map((e) => (
-                  <tr
-                    key={e.id}
-                    className="border-b border-[var(--color-border)] transition-colors duration-[var(--dur-fast)] last:border-0 hover:bg-surface-2"
-                  >
-                    {/* Cell padding 12px on-token (LAY-06 10px family; A.10
-                        comfortable-row standard 12×12). */}
-                    <td className="whitespace-nowrap px-4 py-3 text-muted">{e.at}</td>
-                    <td className="whitespace-nowrap px-4 py-3 text-fg">{e.actor}</td>
-                    <td className="whitespace-nowrap px-4 py-3 text-muted">{e.role}</td>
-                    <td className={`whitespace-nowrap px-4 py-3 font-medium ${ACTION_TONE[e.action] ?? "text-fg"}`}>
-                      {e.action}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-fg">{e.entity}</td>
-                    <td className="px-4 py-3 text-muted">{e.detail}</td>
-                  </tr>
+          <DataTable style={{ fontFamily: "var(--font-mono)" }}>
+            <Thead className="static">
+              <Tr hover={false}>
+                {["Time", "Actor", "Role", "Action", "Entity", "Detail"].map((h) => (
+                  <Th key={h} className="whitespace-nowrap">
+                    {h}
+                  </Th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {auditLog.map((e) => (
+                <Tr key={e.id}>
+                  <Td className="whitespace-nowrap text-muted">{e.at}</Td>
+                  <Td className="whitespace-nowrap text-fg">{e.actor}</Td>
+                  <Td className="whitespace-nowrap text-muted">{e.role}</Td>
+                  <Td className={`whitespace-nowrap font-medium ${ACTION_TONE[e.action] ?? "text-fg"}`}>
+                    {e.action}
+                  </Td>
+                  <Td className="whitespace-nowrap text-fg">{e.entity}</Td>
+                  <Td className="text-muted">{e.detail}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </DataTable>
         </CardContent>
       </Card>
       <p className="max-w-[72ch] text-xs text-muted">

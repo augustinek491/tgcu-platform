@@ -87,7 +87,7 @@ export default function DashboardPage() {
               toolbar={trendLegend}
               actions={
                 /* A.6 maximize-2 → full-screen chart modal (DV-R2-03) */
-                <ChartMaximize label="Maize price trend — full screen">
+                <ChartMaximize label="Maize price trend">
                   <ChartTableSwitch
                     label="Maize price trend (full screen)"
                     toolbar={trendLegend}

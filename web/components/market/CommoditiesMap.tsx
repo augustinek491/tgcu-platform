@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { DataTable, Thead, Tbody, Tr, Th, Td } from "@/components/ui/data-table";
 import { SERIES_COLORS } from "@/components/charts/palette";
 import { cn, formatUGXPerKg } from "@/lib/utils";
 import { MARKETS, MONTHS, latest, priceAt, commodityById } from "@/lib/demo/marketdata";
@@ -161,79 +162,69 @@ export function CommoditiesMap({
           {/* Table fallback (a11y + coverage honesty) — always visible, never a
               toggle (AF-8 preserved). Rows drive the SAME selection as the pins
               and the trend chart; dot color = the market's series color. */}
-          <div className="min-w-0 overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)]">
-            <table className="w-full text-sm">
-              <caption className="sr-only">
+          <DataTable
+            caption={
+              <>
                 Latest {commodity.name} wholesale price by market; non-reporting markets listed as
                 not reporting. Selecting a market plots it on the price trend chart.
-              </caption>
-              <thead>
-                <tr className="border-b border-[var(--color-border)] text-xs text-muted">
-                  <th scope="col" className="px-3 py-2 text-left font-semibold">
-                    Market
-                  </th>
-                  <th scope="col" className="px-3 py-2 text-left font-semibold">
-                    Region
-                  </th>
-                  <th scope="col" className="px-3 py-2 text-right font-semibold">
-                    Price (UGX/kg)
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map(({ market, latest: l }) => {
-                  const selected = selectedIds.includes(market.id);
-                  const seriesColor = selected
-                    ? SERIES_COLORS[selectedIds.indexOf(market.id) % SERIES_COLORS.length]
-                    : undefined;
-                  return (
-                    <tr
-                      key={market.id}
-                      className={cn(
-                        "border-b border-[var(--color-border)] last:border-0",
-                        selected && "bg-surface-2/60",
+              </>
+            }
+            containerClassName="min-w-0 overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)]"
+          >
+            <Thead className="static">
+              <Tr hover={false}>
+                <Th>Market</Th>
+                <Th>Region</Th>
+                <Th align="right">Price (UGX/kg)</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {rows.map(({ market, latest: l }) => {
+                const selected = selectedIds.includes(market.id);
+                const seriesColor = selected
+                  ? SERIES_COLORS[selectedIds.indexOf(market.id) % SERIES_COLORS.length]
+                  : undefined;
+                return (
+                  <Tr key={market.id} hover={false} className={cn(selected && "bg-surface-2/60")}>
+                    {/* Cell padding on-token (LAY-08 2/6px family): 8/4px micro;
+                        the 44px row button keeps the row ≥48. */}
+                    <Td className="px-2 py-1">
+                      <button
+                        type="button"
+                        onClick={() => onToggleMarket(market.id)}
+                        aria-pressed={selected}
+                        className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] px-2 text-left font-medium text-fg transition-colors hover:bg-surface-2"
+                      >
+                        <span
+                          className="inline-block size-2 shrink-0 rounded-full border"
+                          style={
+                            seriesColor
+                              ? { background: seriesColor, borderColor: seriesColor }
+                              : { borderColor: "var(--color-muted)" }
+                          }
+                          aria-hidden="true"
+                        />
+                        {market.name}
+                        <span className="sr-only">
+                          {selected ? "— remove from trend chart" : "— add to trend chart"}
+                        </span>
+                      </button>
+                    </Td>
+                    <Td className="px-3 py-1 text-xs text-muted">{market.region}</Td>
+                    <Td align="right" className="px-3 py-1">
+                      {market.reporting && l ? (
+                        <span className="tabular font-medium text-fg">
+                          {l.price.toLocaleString()}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted">not reporting</span>
                       )}
-                    >
-                      {/* Cell padding on-token (LAY-08 2/6px family): 8/4px micro;
-                          the 44px row button keeps the row ≥48. */}
-                      <td className="px-2 py-1">
-                        <button
-                          type="button"
-                          onClick={() => onToggleMarket(market.id)}
-                          aria-pressed={selected}
-                          className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] px-2 text-left font-medium text-fg transition-colors hover:bg-surface-2"
-                        >
-                          <span
-                            className="inline-block size-2 shrink-0 rounded-full border"
-                            style={
-                              seriesColor
-                                ? { background: seriesColor, borderColor: seriesColor }
-                                : { borderColor: "var(--color-muted)" }
-                            }
-                            aria-hidden="true"
-                          />
-                          {market.name}
-                          <span className="sr-only">
-                            {selected ? "— remove from trend chart" : "— add to trend chart"}
-                          </span>
-                        </button>
-                      </td>
-                      <td className="px-3 py-1 text-xs text-muted">{market.region}</td>
-                      <td className="px-3 py-1 text-right">
-                        {market.reporting && l ? (
-                          <span className="tabular font-medium text-fg">
-                            {l.price.toLocaleString()}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-muted">not reporting</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                    </Td>
+                  </Tr>
+                );
+              })}
+            </Tbody>
+          </DataTable>
         </div>
 
         {/* Card-level provenance (AF-9/DV-02): visible at every breakpoint, ≥12px */}

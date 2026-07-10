@@ -90,6 +90,11 @@
 
   /* Data-viz (blue-anchored categorical — distinct from brand green) */
   --data: #2563eb;
+  /* Sparkline stroke — must clear the WCAG 1.4.11 3:1 graphics floor on BOTH the
+     resting surface AND the surface-2 hover backdrop. Light: --data is fine.
+     Dark: --data #2563eb drops to 2.93:1 on #292524, so lift to blue-400 (§9.10
+     effective-contrast; DM3-04/M11-R4). */
+  --spark: #2563eb;
   --series-sky: #0ea5e9;
   --series-violet: #7c3aed;
   --series-gold: #ca8a04;
@@ -139,6 +144,7 @@
   --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.5);
   --trend-fill-alpha: 0.16; /* §9.10 effective alpha, dark */
   /* Dark-safe semantic text (DS §9.1) — 400-series ramps, ≥4.5:1 on --surface and --bg (DM-05/A11Y-01) */
+  --spark: #60a5fa; /* blue-400 — 3:1+ on #292524 dark hover surface (M11-R4/DM3-04) */
   --success-text: #4ade80;
   --danger-text: #f87171;
   --warning-text: #fbbf24;
@@ -575,4 +581,11 @@
   .theme-fade *::after {
     transition: none !important;
   }
+}
+
+/* Recharts axis ticks render digits in a <tspan>; the tick-object presentation
+   attribute doesn't reach it, so pin tabular figures via CSS (TYP/M11-R4). */
+.recharts-cartesian-axis-tick-value,
+.recharts-cartesian-axis-tick-value tspan {
+  font-variant-numeric: tabular-nums;
 }

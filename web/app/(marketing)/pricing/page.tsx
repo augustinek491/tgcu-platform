@@ -93,11 +93,14 @@ export default function PricingPage() {
           restrained low-height band BELOW the tier data — data-first, never competing.
           Lazy by default (no priority); ≤120KB served via sizes + quality. */}
       <figure className="mt-12 overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)]">
+        {/* q74 (was 60) — the grain-macro texture read soft on retina at 60 (CE M17
+            lever). Source is 2560px so next/image serves a sharp 2× variant; the short
+            band keeps bytes modest. */}
         <Image
           src={cropsMacro}
           alt="Dried maize and sorghum grains in golden light"
           placeholder="blur"
-          quality={60}
+          quality={74}
           sizes="(min-width: 1328px) 1232px, calc(100vw - 48px)"
           className="h-[200px] w-full object-cover md:h-[220px]"
         />

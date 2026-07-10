@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DataTable, Thead, Tbody, Tr, Th, Td } from "@/components/ui/data-table";
 import { RBAC_ROLES, RBAC_MATRIX } from "@/lib/demo/admin";
 import { cn } from "@/lib/utils";
 
@@ -40,50 +41,48 @@ export default function RolesPage() {
 
       <Card>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--color-border)]">
-                  <th className="px-4 py-3 text-left font-medium text-muted">Capability</th>
-                  {RBAC_ROLES.map((r) => (
-                    <th key={r} className="px-3 py-3 text-center text-xs font-medium text-muted">
-                      {r}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              {/* Compact-table cells on the 8px grid (LAY-06/08): py-2 keeps
-                  rows ≥36 per A.10's compact floor. */}
-              <tbody>
-                {RBAC_MATRIX.map((row) => (
-                  <tr key={row.capability} className="border-b border-[var(--color-border)] last:border-0">
-                    <td className="whitespace-nowrap px-4 py-2 text-fg">{row.capability}</td>
-                    {row.perms.map((perm, i) => (
-                      <td key={i} className="px-3 py-2 text-center">
-                        {perm === "—" ? (
-                          <span className="text-muted">—</span>
-                        ) : (
-                          <span
-                            className={cn(
-                              "inline-block rounded-[var(--radius-sm)] px-2 py-1 text-xs font-medium",
-                              perm.includes("A") || perm.includes("U") || perm.includes("C")
-                                ? "bg-brand-800/10 text-brand-800 dark:bg-brand-600/15 dark:text-brand-300"
-                                : "text-muted",
-                            )}
-                          >
-                            {perm}
-                          </span>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
+          <DataTable>
+            <Thead className="static">
+              <Tr hover={false}>
+                <Th>Capability</Th>
+                {RBAC_ROLES.map((r) => (
+                  <Th key={r} align="center">
+                    {r}
+                  </Th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </Tr>
+            </Thead>
+            {/* Compact-table cells on the 8px grid (LAY-06/08): py-2 keeps
+                rows ≥36 per A.10's compact floor. */}
+            <Tbody>
+              {RBAC_MATRIX.map((row) => (
+                <Tr key={row.capability} hover={false}>
+                  <Td className="whitespace-nowrap text-fg">{row.capability}</Td>
+                  {row.perms.map((perm, i) => (
+                    <Td key={i} align="center">
+                      {perm === "—" ? (
+                        <span className="text-muted">—</span>
+                      ) : (
+                        <span
+                          className={cn(
+                            "inline-block rounded-[var(--radius-sm)] px-2 py-1 text-xs font-medium",
+                            perm.includes("A") || perm.includes("U") || perm.includes("C")
+                              ? "bg-brand-800/10 text-brand-800 dark:bg-brand-600/15 dark:text-brand-300"
+                              : "text-muted",
+                          )}
+                        >
+                          {perm}
+                        </span>
+                      )}
+                    </Td>
+                  ))}
+                </Tr>
+              ))}
+            </Tbody>
+          </DataTable>
         </CardContent>
       </Card>
-      <p className="text-xs text-muted">
+      <p className="max-w-[72ch] text-xs text-muted">
         C = Create · R = Read · U = Update · D = Deactivate · A = Approve/Decide · exp = Export ·
         — = no access.
         Org-scoped rows apply only to the user&apos;s own org.

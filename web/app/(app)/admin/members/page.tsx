@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TierBadge, StandingBadge } from "@/components/membership/badges";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
+import { DataTable, Thead, Tbody, Tr, Th, Td } from "@/components/ui/data-table";
 import { orgs, arrears, invoicesForOrg } from "@/lib/demo/membership";
 import { isVerified } from "@/lib/membership/model";
 import { formatUGX } from "@/lib/utils";
@@ -54,7 +55,7 @@ export default function AdminMembersPage() {
             rows={arr.map((a) => [
               a.org.legalName,
               <TierBadge key="t" tierId={a.org.tierId} />,
-              a.invoice.number,
+              <span key="inv" className="font-mono text-xs">{a.invoice.number}</span>,
               <span key="o" className="tabular font-medium">{formatUGX(a.outstanding)}</span>,
               <span key="d" className="tabular">{a.days}</span>,
               <StandingBadge key="s" standing={a.org.standing} />,
@@ -126,41 +127,39 @@ function Table({
 }: {
   head: string[];
   rows: React.ReactNode[][];
-  /** Column indexes whose header + cells right-align (06 A.10 numerics rule). */
+  /** Column indexes whose header + cells right-align + go tabular (06 A.10 numerics rule). */
   numericCols?: number[];
 }) {
-  // Cell padding 16×12 on-token (LAY-07: 20px is sanctioned as card padding only).
-  const alignClass = (j: number) => (numericCols.includes(j) ? "text-right" : "text-left");
+  // Built on the shared <DataTable> registry primitives (DS §9.8/AM-24): ONE th
+  // convention (px-3 py-2 · font-semibold), numeric columns right-aligned + tabular.
+  const align = (j: number): "left" | "right" => (numericCols.includes(j) ? "right" : "left");
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-[var(--color-border)]">
-            {head.map((h, j) => (
-              <th
-                key={h}
-                className={`whitespace-nowrap px-4 py-3 font-medium text-muted ${alignClass(j)}`}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, i) => (
-            <tr
-              key={i}
-              className="border-b border-[var(--color-border)] transition-colors duration-[var(--dur-fast)] last:border-0 hover:bg-surface-2"
-            >
-              {row.map((cell, j) => (
-                <td key={j} className={`px-4 py-3 align-middle text-fg ${alignClass(j)}`}>
-                  {cell}
-                </td>
-              ))}
-            </tr>
+    <DataTable>
+      <Thead className="static">
+        <Tr hover={false}>
+          {head.map((h, j) => (
+            <Th key={h} align={align(j)} className="whitespace-nowrap">
+              {h}
+            </Th>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {rows.map((row, i) => (
+          <Tr key={i}>
+            {row.map((cell, j) => (
+              <Td
+                key={j}
+                align={align(j)}
+                tabular={numericCols.includes(j)}
+                className="align-middle text-fg"
+              >
+                {cell}
+              </Td>
+            ))}
+          </Tr>
+        ))}
+      </Tbody>
+    </DataTable>
   );
 }
