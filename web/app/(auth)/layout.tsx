@@ -30,7 +30,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         <div className="relative z-10 space-y-1 text-xs text-brand-300">
           <p>Informational, not financial advice.</p>
-          <p>Demonstration platform · sandbox data.</p>
+          <p>Demonstration platform · seeded data</p>
         </div>
 
         {/* PART I.4 motif — texture, not illustration; decorative only */}
@@ -40,12 +40,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Form panel */}
       <div className="flex min-h-dvh flex-col lg:min-h-0">
         {/* Slim brand bar (<1024) — PART C: the brand panel becomes a slim top bar */}
-        <div className="flex h-14 shrink-0 items-center bg-brand-800 px-5 lg:hidden">
+        <div className="flex h-14 shrink-0 items-center bg-brand-800 px-4 lg:hidden">
           <Link href="/" aria-label="TGCU home">
             <LogoWordmark tone="onBrand" markSize={26} />
           </Link>
         </div>
-        <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-12">
+        {/* 432 − 2×16 gutter = the PART C card max-w 400 (LAY-15); px-4 on-token (LAY-07) */}
+        <div className="mx-auto flex w-full max-w-[432px] flex-1 flex-col justify-center px-4 py-12">
           <main id="main">{children}</main>
         </div>
       </div>

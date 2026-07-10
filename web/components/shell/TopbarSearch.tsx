@@ -10,8 +10,10 @@ import { searchSeeded, type SearchHit } from "@/lib/demo/search";
  * Global search (FLOW-05) — executes against the canonical seeded dataset
  * (members, markets, listings) with a keyboard-navigable combobox. Honestly
  * demo-scoped: the panel says so, and results deep-link to the module pages.
+ * `className` lets non-topbar hosts (the 404 page, 01 §6.7) override the
+ * topbar-only visibility defaults. No-match state offers actions (CON-R2-08).
  */
-export function TopbarSearch() {
+export function TopbarSearch({ className }: { className?: string }) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
@@ -44,7 +46,7 @@ export function TopbarSearch() {
 
   return (
     <div
-      className="relative hidden max-w-sm flex-1 md:block"
+      className={cn("relative hidden max-w-sm flex-1 md:block", className)}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
       }}
@@ -74,8 +76,9 @@ export function TopbarSearch() {
         onKeyDown={onKeyDown}
         className="h-11 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-bg pl-9 pr-3 text-base placeholder:text-muted focus-visible:border-ring"
       />
+      {/* z-20 = dropdown layer per DS §4 (LAY-13: 30 is the overlay role) */}
       {showPanel && (
-        <div className="menu-enter absolute left-0 right-0 top-[calc(100%+4px)] z-30 overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] bg-surface shadow-lg">
+        <div className="menu-enter absolute left-0 right-0 top-[calc(100%+4px)] z-20 overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] bg-surface shadow-lg">
           {results.length > 0 ? (
             <ul
               id="topbar-search-results"
@@ -103,18 +106,43 @@ export function TopbarSearch() {
                     <span className="block truncate text-sm font-medium text-fg">{hit.label}</span>
                     <span className="block truncate text-xs text-muted">{hit.sub}</span>
                   </span>
-                  <span className="shrink-0 text-[11px] font-medium uppercase tracking-wide text-muted">
+                  <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-muted">
                     {hit.group}
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p role="status" className="px-3 py-4 text-sm text-muted">
-              No matches in the seeded dataset.
-            </p>
+            <div className="px-3 py-4 text-sm">
+              <p role="status" className="text-muted">
+                No matches in the seeded dataset. Try &ldquo;Aponye&rdquo;, &ldquo;Gulu&rdquo; or{" "}
+                &ldquo;maize&rdquo;.
+              </p>
+              <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    router.push("/marketplace");
+                  }}
+                  className="font-medium text-brand-interactive hover:underline"
+                >
+                  Browse marketplace
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    router.push("/admin/members");
+                  }}
+                  className="font-medium text-brand-interactive hover:underline"
+                >
+                  View members
+                </button>
+              </p>
+            </div>
           )}
-          <p className="border-t border-[var(--color-border)] px-3 py-2 text-[11px] text-muted">
+          <p className="border-t border-[var(--color-border)] px-3 py-2 text-xs text-muted">
             Demo-scoped search · seeded members, markets &amp; listings
           </p>
         </div>

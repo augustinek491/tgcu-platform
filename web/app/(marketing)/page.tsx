@@ -247,7 +247,7 @@ export default function LandingPage() {
             const Icon = m.icon;
             return (
               <Card key={m.title} className="p-6">
-                <div className="mb-4 grid size-11 place-items-center rounded-[var(--radius-sm)] bg-brand-800/10 text-brand-700 dark:bg-brand-600/15 dark:text-brand-500">
+                <div className="mb-4 grid size-11 place-items-center rounded-[var(--radius-sm)] bg-brand-800/10 text-brand-700 dark:bg-brand-600/15 dark:text-brand-300">
                   <Icon className="size-5" />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-fg">{m.title}</h3>

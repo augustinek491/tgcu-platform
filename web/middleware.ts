@@ -27,5 +27,7 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  // `tiles` excluded (PERF-R2-02): each map view issues 9+ ranged pmtiles/glyph
+  // requests — static assets need no edge gate, in demo mode or out of it.
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|tiles).*)"],
 };

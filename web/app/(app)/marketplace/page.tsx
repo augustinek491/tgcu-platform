@@ -29,7 +29,7 @@ export default function MarketplacePage() {
       </div>
 
       {/* Sandbox honesty banner */}
-      <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/8 p-3 text-sm">
+      <div className="flex items-start gap-3 rounded-[var(--radius-card)] border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/8 p-3 text-sm">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--color-warning)]" />
         <p className="text-fg">
           <span className="font-semibold">Sandbox demo:</span>{" "}
@@ -53,7 +53,7 @@ export default function MarketplacePage() {
             {ACTIVE_DEAL.dealId}
           </p>
         </div>
-        <Link href="/marketplace/deal" className={cn(buttonVariants({ size: "sm" }), "h-11 lg:h-9")}>
+        <Link href="/marketplace/deal" className={cn(buttonVariants({ size: "sm" }), "h-11 lg:h-10")}>
           Open deal <ArrowRight className="size-4" />
         </Link>
       </Card>

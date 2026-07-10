@@ -134,11 +134,14 @@ export function buildMapStyle(theme: MapTheme, opts?: { reducedMotion?: boolean 
   return {
     version: 8,
     name: `tgcu-${theme}`,
-    // Self-hosted glyph PBFs (Noto Sans Regular/Medium/Italic, 256 ranges each).
+    // Self-hosted glyph PBFs. The style demands ONE stack ("Noto Sans Regular")
+    // so a second 0-255 fetch can never occur (PERF-R2-01: dual stacks cost
+    // ~77.6KB on 3G; country labels differentiate by size/letter-spacing).
     glyphs: `${origin}/tiles/fonts/{fontstack}/{range}.pbf`,
     // Theme swap = setStyle(diff) — a short paint crossfade reads as intentional;
-    // zeroed under prefers-reduced-motion (H.2 rule).
-    transition: { duration: opts?.reducedMotion ? 0 : 250, delay: 0 },
+    // 200ms per H.2's theme-crossfade row (MOT-R2-N2); zeroed under
+    // prefers-reduced-motion.
+    transition: { duration: opts?.reducedMotion ? 0 : 200, delay: 0 },
     sources: {
       protomaps: {
         type: "vector",
@@ -309,7 +312,12 @@ export function buildMapStyle(theme: MapTheme, opts?: { reducedMotion?: boolean 
         type: "symbol",
         source: "protomaps",
         "source-layer": "places",
-        minzoom: 5.5,
+        // minzoom 7 (was 5.5): at the national fitBounds view (~z6) the 8 HTML
+        // price pins already name every market, and parsing locality labels at
+        // low zoom pulled the Latin-Extended 256-511 glyph range (127.7KB) for
+        // stray borderland names (PERF-R2-01). Zoomed past 7, locality context
+        // appears — and any extra glyph range is then genuinely needed.
+        minzoom: 7,
         filter: ["==", ["get", "kind"], "locality"] as ExpressionSpecification,
         layout: {
           "text-field": localityText,
@@ -334,7 +342,10 @@ export function buildMapStyle(theme: MapTheme, opts?: { reducedMotion?: boolean 
         filter: ["==", ["get", "kind"], "country"] as ExpressionSpecification,
         layout: {
           "text-field": localityText,
-          "text-font": ["Noto Sans Medium"],
+          // Single glyph stack (PERF-R2-01) — weight contrast dropped in favor
+          // of the existing letter-spacing/size distinction; saves a full
+          // 0-255 PBF (~77.6KB) on every first map view.
+          "text-font": ["Noto Sans Regular"],
           "text-size": 12,
           "text-letter-spacing": 0.05,
           "text-max-width": 8,

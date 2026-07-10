@@ -22,8 +22,8 @@ function NavLink({
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
       className={cn(
-        // h-11 = 44px row → touch target per 06 A.3 ("item h44"); was py-2 (36px).
-        "flex h-11 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition-colors duration-[var(--dur-fast)]",
+        // h-11 = 44px row, px-4 = 16px item padding per 06 A.3 ("item h44, px-16").
+        "flex h-11 items-center gap-3 rounded-[var(--radius-sm)] px-4 text-sm font-medium transition-colors duration-[var(--dur-fast)]",
         active
           ? // Active: brand-interactive text (brand-700/brand-300, DS §9.1) + tint;
             // dark = brand-600 @20% + 3px --grain-500 accent bar (06 A.3/H.1, DM-02).
@@ -82,7 +82,8 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
   return (
     // Dark sidebar = --brand-900 surface with --brand-800 dividers (06 A.3 / H.1 / AM-06).
     <aside className="hidden w-64 shrink-0 flex-col border-r border-[var(--color-border)] bg-surface lg:flex dark:border-brand-800 dark:bg-brand-900">
-      <div className="flex h-16 items-center gap-2.5 border-b border-[var(--color-border)] px-5 dark:border-brand-800">
+      {/* px-6/gap-3 on-token (LAY-06/07; A.2 shell bars px-24) */}
+      <div className="flex h-16 items-center gap-3 border-b border-[var(--color-border)] px-6 dark:border-brand-800">
         <LogoMark size={28} />
         <span className="font-display text-sm font-semibold tracking-tight text-fg">TGCU</span>
       </div>

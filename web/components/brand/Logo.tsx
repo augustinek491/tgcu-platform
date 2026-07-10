@@ -120,7 +120,7 @@ export function LogoWordmark({
         </span>
         <span
           className={cn(
-            "block text-[11px] font-medium uppercase tracking-[0.14em]",
+            "block text-xs font-medium uppercase tracking-[0.14em]",
             onBrand ? "text-brand-300" : "text-muted",
           )}
         >

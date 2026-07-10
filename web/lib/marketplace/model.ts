@@ -25,6 +25,19 @@ export type Party = {
   anchorBuyer?: boolean;
 };
 
+/** A reference-price anchor whose figure, source and period are derived together
+ * from the canonical market-data engine — one source label per figure (CON-R2-01). */
+export type ListingReference = {
+  ugxPerKg: number;
+  /** Which figure this is: a reporting market's latest (e.g. "Mbale") or the
+   * national average when the listing market is not reporting. */
+  basis: string;
+  /** The commodity series' own canonical source label. */
+  source: string;
+  /** Month label of the observation, e.g. "Jun 2026". */
+  asOf: string;
+};
+
 export type Listing = {
   listingId: string;
   type: ListingType;
@@ -32,7 +45,7 @@ export type Listing = {
   quantityKg: number;
   grade: Grade;
   priceUGXPerKg: number | null; // null = open to offers
-  referenceUGXPerKg: number;
+  reference: ListingReference;
   market: string;
   region: string;
   logistics: "Seller delivers" | "Buyer collects" | "—";

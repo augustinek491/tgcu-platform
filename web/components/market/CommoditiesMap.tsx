@@ -194,12 +194,14 @@ export function CommoditiesMap({
                         selected && "bg-surface-2/60",
                       )}
                     >
-                      <td className="px-1.5 py-0.5">
+                      {/* Cell padding on-token (LAY-08 2/6px family): 8/4px micro;
+                          the 44px row button keeps the row ≥48. */}
+                      <td className="px-2 py-1">
                         <button
                           type="button"
                           onClick={() => onToggleMarket(market.id)}
                           aria-pressed={selected}
-                          className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] px-1.5 text-left font-medium text-fg transition-colors hover:bg-surface-2"
+                          className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] px-2 text-left font-medium text-fg transition-colors hover:bg-surface-2"
                         >
                           <span
                             className="inline-block size-2 shrink-0 rounded-full border"
@@ -216,8 +218,8 @@ export function CommoditiesMap({
                           </span>
                         </button>
                       </td>
-                      <td className="px-3 py-0.5 text-xs text-muted">{market.region}</td>
-                      <td className="px-3 py-0.5 text-right">
+                      <td className="px-3 py-1 text-xs text-muted">{market.region}</td>
+                      <td className="px-3 py-1 text-right">
                         {market.reporting && l ? (
                           <span className="tabular font-medium text-fg">
                             {l.price.toLocaleString()}

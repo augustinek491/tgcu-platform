@@ -76,7 +76,7 @@ export function DuesCard({ invoices }: { invoices: Invoice[] }) {
                 </span>
                 {!isPaid &&
                   (isActive ? (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 dark:text-brand-500">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 dark:text-brand-300">
                       {state === "success" ? (
                         <Check className="size-4" />
                       ) : (
@@ -96,7 +96,7 @@ export function DuesCard({ invoices }: { invoices: Invoice[] }) {
           );
         })}
         {outstanding.length === 0 && (
-          <p className="rounded-[var(--radius-sm)] bg-[var(--color-success)]/10 p-3 text-sm text-[var(--color-success)]">
+          <p className="rounded-[var(--radius-sm)] bg-[var(--color-success)]/10 p-3 text-sm text-[var(--success-badge-text)]">
             All dues settled — you&apos;re in good standing.
           </p>
         )}

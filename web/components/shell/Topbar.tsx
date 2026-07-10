@@ -9,7 +9,8 @@ import { LogoMark } from "@/components/brand/Logo";
 export function Topbar({ isAdmin = false }: { isAdmin?: boolean }) {
   return (
     // h56 mobile / h64 ≥768 (06 PART G shell row · A.2; MOB-04).
-    <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-[var(--color-border)] bg-surface/80 px-5 backdrop-blur md:h-16 lg:gap-4">
+    // px-6 per 06 A.2 (shell bars px-24 — LAY-07's 20px family).
+    <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-[var(--color-border)] bg-surface/80 px-6 backdrop-blur md:h-16 lg:gap-4">
       {/* <1024: hamburger + logo mark live in topbar-left (DS §9.8 / AM-25; A11Y-10, BR-02).
           ≥1024 the sidebar carries both, so the cluster hides. */}
       <div className="flex shrink-0 items-center gap-1.5 lg:hidden">

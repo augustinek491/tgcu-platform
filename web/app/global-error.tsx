@@ -79,7 +79,7 @@ export default function GlobalError({
             </a>
           </div>
           {error.digest && (
-            <p style={{ marginTop: 16, fontSize: 11, color: "#57534e", fontFamily: "ui-monospace, monospace" }}>
+            <p style={{ marginTop: 16, fontSize: 12, color: "#57534e", fontFamily: "ui-monospace, monospace" }}>
               Reference: {error.digest}
             </p>
           )}

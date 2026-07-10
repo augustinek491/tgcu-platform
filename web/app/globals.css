@@ -165,8 +165,10 @@
     --dur-draw: 0ms;
   }
   /* Static skeleton/spinner — Tailwind's animate-* utilities don't consume the zeroed
-     duration vars, so kill the animations outright (H.2 reduced-motion rule; A11Y-12). */
+     duration vars, so kill the animations outright (H.2 reduced-motion rule; A11Y-12).
+     The grain-sweep now lives on .skeleton::after (transform overlay, MOT-R2-01). */
   .skeleton,
+  .skeleton::after,
   .animate-pulse,
   .animate-spin {
     animation: none;
@@ -313,26 +315,35 @@
   }
 }
 
-/* ── Skeleton: grain-sweep shimmer (H.2 "Skeleton shimmer 1400ms loop, linear, gradient
-   sweep"; AM-23 motif family). Base tone = --color-surface-2; harvest-gold sheen via
-   --shimmer. Under prefers-reduced-motion the animation is removed (static skeleton). */
+/* ── Skeleton: grain-sweep shimmer (H.2 row 9 "1400ms loop, linear, TRANSFORM
+   (gradient sweep)"; AM-23 motif family; MOT-R2-01). The sheen is an overlay
+   pseudo-element translated across the block — compositor-only, exactly like
+   the cta-glint pattern — never background-position (which paints per frame).
+   Base tone = --color-surface-2; harvest-gold sheen via --shimmer. Under
+   prefers-reduced-motion the animation is removed (static skeleton). */
 @keyframes grain-sweep {
   from {
-    background-position: 200% 0;
+    transform: translateX(-100%);
   }
   to {
-    background-position: -200% 0;
+    transform: translateX(100%);
   }
 }
 
 @layer components {
   .skeleton {
+    position: relative;
+    overflow: hidden;
     background-color: var(--color-surface-2);
-    background-image: linear-gradient(100deg, transparent 35%, var(--shimmer) 50%, transparent 65%);
-    background-size: 200% 100%;
-    background-repeat: no-repeat;
     border-radius: var(--radius-sm);
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(100deg, transparent 35%, var(--shimmer) 50%, transparent 65%);
     animation: grain-sweep var(--dur-shimmer) linear infinite;
+    will-change: transform;
   }
 
   /* Sidebar active item — dark mode adds the 3px --grain-500 accent bar

@@ -89,18 +89,24 @@ export function OfferDialog({
   const mt = Math.round(listing.quantityKg / 1000);
 
   return (
-    <div
-      className="scrim-enter fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-      onClick={onClose}
-      onKeyDown={trapTab}
-    >
+    <>
+      {/* Scrim on its own overlay layer — z30 + rgba(12,10,9,.48) per F.8/DS §4
+          (LAY-13: scrim and modal no longer share one z-50 wrapper). */}
+      <div
+        className="scrim-enter fixed inset-0 z-30 bg-[rgba(12,10,9,0.48)]"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4"
+        onKeyDown={trapTab}
+      >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        onClick={(e) => e.stopPropagation()}
-        className="modal-enter max-h-[85vh] w-full max-w-md overflow-y-auto rounded-[var(--radius-card)] border border-[var(--color-border)] bg-surface p-5 shadow-[var(--shadow-pop)]"
+        className="modal-enter pointer-events-auto max-h-[85vh] w-full max-w-[480px] overflow-y-auto rounded-[var(--radius-card)] border border-[var(--color-border)] bg-surface p-6 shadow-[var(--shadow-pop)]"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -134,8 +140,8 @@ export function OfferDialog({
             <p className="font-medium text-fg">Open to offers — no asking price set.</p>
           )}
           <p className="mt-0.5">
-            Reference UGX {listing.referenceUGXPerKg.toLocaleString()}/kg · MAAIF / TGCU tracker · as of
-            Jun 2026
+            Reference UGX {listing.reference.ugxPerKg.toLocaleString()}/kg · {listing.reference.basis} ·{" "}
+            {listing.reference.source} · as of {listing.reference.asOf}
           </p>
         </div>
 
@@ -173,12 +179,12 @@ export function OfferDialog({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
-            className="mt-1.5 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 py-2.5 text-base text-fg focus:border-ring"
+            className="mt-1.5 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 py-2 text-base text-fg focus:border-ring"
             placeholder={isBuy ? "e.g. Can deliver within 5 days" : "e.g. Collecting from your store"}
           />
 
           {/* Sandbox honesty label — persistent on every money surface (F.M6) */}
-          <p className="mt-3 flex items-start gap-1.5 rounded-[var(--radius-sm)] bg-[var(--color-warning)]/14 p-2.5 text-xs text-[var(--warning-badge-text)] dark:bg-[var(--color-warning)]/20">
+          <p className="mt-3 flex items-start gap-2 rounded-[var(--radius-sm)] bg-[var(--color-warning)]/14 p-3 text-xs text-[var(--warning-badge-text)] dark:bg-[var(--color-warning)]/20">
             <ShieldCheck className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
             <span>
               Demo sandbox — this offer is recorded in your session only. No real funds move and no
@@ -194,6 +200,7 @@ export function OfferDialog({
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

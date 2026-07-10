@@ -12,7 +12,14 @@ export function TierBadge({ tierId, className }: { tierId: TierId; className?: s
         "inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] px-2.5 py-0.5 text-xs font-semibold",
         className,
       )}
-      style={{ color: tier.accentVar, background: `color-mix(in srgb, ${tier.accentVar} 14%, transparent)` }}
+      // Text = tier text-safe pair (DS §9.1 / AM-04); gold-family tints ≤10% (ratified
+      // 2026-07-10): gold 10% → 4.55:1, bronze (amber fill, darker) needs 7% → 4.57:1.
+      style={{
+        color: `var(--tier-${tier.id}-text)`,
+        background: `color-mix(in srgb, ${tier.accentVar} ${
+          tier.id === "gold" ? 10 : tier.id === "bronze" ? 7 : 14
+        }%, transparent)`,
+      }}
     >
       <span className="size-1.5 rounded-full" style={{ background: tier.accentVar }} />
       {tier.name}
@@ -20,10 +27,11 @@ export function TierBadge({ tierId, className }: { tierId: TierId; className?: s
   );
 }
 
+// On-tint text = *-badge-text pairs, tint 14%/20% — mirrors core Badge (DS §9.1 / AM-01).
 const STANDING_STYLE: Record<Standing, string> = {
-  good: "text-[var(--color-success)] bg-[var(--color-success)]/12",
-  grace: "text-[var(--color-warning)] bg-[var(--color-warning)]/12",
-  suspended: "text-[var(--color-danger)] bg-[var(--color-danger)]/12",
+  good: "text-[var(--success-badge-text)] bg-[var(--color-success)]/14 dark:bg-[var(--color-success)]/20",
+  grace: "text-[var(--warning-badge-text)] bg-[var(--color-warning)]/14 dark:bg-[var(--color-warning)]/20",
+  suspended: "text-[var(--danger-badge-text)] bg-[var(--color-danger)]/14 dark:bg-[var(--color-danger)]/20",
   lapsed: "text-muted bg-surface-2",
 };
 

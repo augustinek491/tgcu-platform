@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Info } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DeltaPill } from "@/components/ui/delta-pill";
 import { MarketExplorer } from "@/components/market/MarketExplorer";
+import { MoversCard, type MoverRow } from "@/components/market/MoversCard";
 import {
   COMMODITIES,
   movers,
@@ -17,26 +17,6 @@ import { tierById } from "@/lib/membership/tiers";
 
 export const metadata: Metadata = { title: "Market data" };
 
-/** Mini sparkline geometry (06 A.7: w64 h20) — single-hue `--data` per ratified
- * DS §9.4/DV-05; direction is carried by the delta pill, never by color alone. */
-function sparkPoints(vals: (number | null)[], w = 64, h = 20, pad = 2): string {
-  const nums = vals.filter((v): v is number => v != null);
-  if (nums.length < 2) return "";
-  const min = Math.min(...nums);
-  const max = Math.max(...nums);
-  return vals
-    .map((v, i) =>
-      v == null
-        ? null
-        : `${(pad + (i * (w - 2 * pad)) / (vals.length - 1)).toFixed(1)},${(max === min
-            ? h / 2
-            : pad + (h - 2 * pad) * (1 - (v - min) / (max - min))
-          ).toFixed(1)}`,
-    )
-    .filter(Boolean)
-    .join(" ");
-}
-
 export default function MarketPage() {
   const org = currentOrg();
   const tier = tierById(org.tierId);
@@ -46,9 +26,21 @@ export default function MarketPage() {
   const periodLabel = `${outlook.period.label} ${outlook.period.year}`;
   // Union of the canonical source labels behind the cross-commodity aggregates (AF-9).
   const aggregateSources = [...new Set(COMMODITIES.map((c) => c.source))].join(" · ");
+  // Commodity-level movers → shared A.7 card rows (label · sparkline · value · delta).
+  const moverRows: MoverRow[] = movementList.map((m) => ({
+    key: m.commodity.id,
+    label: m.commodity.name,
+    spark: nationalSeries(m.commodity.id, 8),
+    value: m.latest.toLocaleString(),
+    delta: {
+      dir: m.dir,
+      text: `${m.pct >= 0 ? "+" : "−"}${Math.abs(m.pct).toFixed(1)}%`,
+    },
+  }));
 
   return (
-    <div className="space-y-6">
+    // A.1 rhythm: 32px between page regions (LAY-01).
+    <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-[28px] font-semibold text-fg">Market data & analytics</h1>
@@ -73,7 +65,8 @@ export default function MarketPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {/* Stat-strip gutter unified at 24 (A.1; LAY-01 "gutter vocabulary") */}
+          <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-5">
             {outlook.commodities.map((c) => (
               <div key={c.name} className="rounded-[var(--radius-sm)] border border-[var(--color-border)] p-3">
                 <div className="text-sm font-medium text-fg">{c.name}</div>
@@ -102,71 +95,21 @@ export default function MarketPage() {
         maxRange={maxRange}
         tierName={tier.name}
         moversSlot={
-          <Card className="min-w-0">
-            <CardHeader>
-              <CardTitle>Movers</CardTitle>
-              <p className="text-sm text-muted">
-                Month-over-month · national average, UGX/kg · {movementList[0].fromMonth.label} →{" "}
-                {movementList[0].toMonth.label} {movementList[0].toMonth.year}
-              </p>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-1">
-                {movementList.map((m) => (
-                  <li
-                    key={m.commodity.id}
-                    className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] px-2 py-2 transition-colors duration-[var(--dur-fast)] hover:bg-surface-2"
-                  >
-                    <span className="min-w-0 truncate text-sm font-medium text-fg">
-                      {m.commodity.name}
-                    </span>
-                    {/* Mini sparkline (A.7/DV-07) — decorative; the value + pill
-                        are the data record. 8-month reporting-market average. */}
-                    <svg
-                      viewBox="0 0 64 20"
-                      width="64"
-                      height="20"
-                      aria-hidden="true"
-                      className="ml-auto shrink-0 text-[var(--data)]"
-                    >
-                      <polyline
-                        points={sparkPoints(nationalSeries(m.commodity.id, 8))}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinejoin="round"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <div className="text-right">
-                      <div className="tabular text-sm text-fg">{m.latest.toLocaleString()}</div>
-                      <DeltaPill dir={m.dir} className="mt-0.5">
-                        {m.pct >= 0 ? "+" : "−"}
-                        {Math.abs(m.pct).toFixed(1)}%
-                      </DeltaPill>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              {/* Footer link (A.7/DV-07) — the dashboard carries the
-                  market-level movers list */}
-              <Link
-                href="/dashboard"
-                className="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-brand-interactive hover:underline"
-              >
-                View all movers →
-              </Link>
-              {/* Card-level provenance (AF-9) */}
-              <p className="mt-1 text-xs text-muted">
-                as of {periodLabel} · {aggregateSources}
-              </p>
-            </CardContent>
-          </Card>
+          /* Shared A.7 movers treatment (DV-R2-01) — the dashboard carries the
+             market-level movers list, hence the cross-link. */
+          <MoversCard
+            subtitle={`Month-over-month · national average, UGX/kg · ${movementList[0].fromMonth.label} → ${movementList[0].toMonth.label} ${movementList[0].toMonth.year}`}
+            rows={moverRows}
+            footerHref="/dashboard"
+            asOf={periodLabel}
+            sources={aggregateSources}
+          />
         }
       />
 
-      {/* Honest forecasting note (FR-MKT-19/23 — v1 = historical + seasonal only) */}
-      <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-surface-2 p-4 text-sm text-muted">
+      {/* Honest forecasting note (FR-MKT-19/23 — v1 = historical + seasonal only).
+          p-5/gap-3: default card padding — not a dense surface (LAY-10 / DS §9.3). */}
+      <div className="flex items-start gap-3 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-surface-2 p-5 text-sm text-muted">
         <Info className="mt-0.5 size-4 shrink-0" />
         <p>
           v1 shows <span className="font-medium text-fg">historical data and seasonal context only</span> —

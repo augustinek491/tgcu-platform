@@ -77,7 +77,7 @@ export function NotificationsBell() {
           role="dialog"
           aria-label="Notifications"
           tabIndex={-1}
-          className="menu-enter absolute right-0 top-[calc(100%+6px)] z-30 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] bg-surface shadow-lg outline-none"
+          className="menu-enter absolute right-0 top-[calc(100%+6px)] z-20 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] bg-surface shadow-lg"
         >
           <div className="flex items-center justify-between gap-2 border-b border-[var(--color-border)] px-4 py-2">
             <p className="text-sm font-semibold text-fg">Notifications</p>
@@ -95,11 +95,11 @@ export function NotificationsBell() {
                   <Link
                     href={n.href}
                     onClick={() => setOpen(false)}
-                    className="block min-h-11 px-4 py-2.5 transition-colors duration-[var(--dur-fast)] hover:bg-surface-2 focus-visible:bg-surface-2 focus-visible:outline-none"
+                    className="block min-h-11 px-4 py-2.5 transition-colors duration-[var(--dur-fast)] hover:bg-surface-2 focus-visible:bg-surface-2"
                   >
                     <span className="flex items-baseline justify-between gap-2">
                       <span className="text-sm font-medium text-fg">{n.title}</span>
-                      <span className="shrink-0 text-[11px] text-muted">{n.at}</span>
+                      <span className="shrink-0 text-xs text-muted">{n.at}</span>
                     </span>
                     <span className="mt-0.5 block text-xs text-muted">{n.body}</span>
                   </Link>
@@ -117,7 +117,7 @@ export function NotificationsBell() {
             </div>
           )}
 
-          <p className="border-t border-[var(--color-border)] px-4 py-2 text-[11px] text-muted">
+          <p className="border-t border-[var(--color-border)] px-4 py-2 text-xs text-muted">
             Seeded demo notifications · session-only
           </p>
         </div>

@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Deal" };
 
 export default function DealPage() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <Link
         href="/marketplace"
         className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand-interactive hover:underline lg:min-h-0"

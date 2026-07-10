@@ -42,12 +42,14 @@ export default function AdminMembersPage() {
       {/* Arrears */}
       <Card>
         <CardHeader className="flex-row items-center gap-2">
-          <AlertTriangle className="size-4 text-[var(--color-warning)]" />
+          <AlertTriangle className="size-4 text-warning-text" />
           <CardTitle>Arrears — auto-flagged ≤24h after due date</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <Table
             head={["Organisation", "Tier", "Invoice", "Outstanding", "Days overdue", "Standing"]}
+            // Money + counts right-aligned tabular per 06 A.10 (LAY-05).
+            numericCols={[3, 4]}
             rows={arr.map((a) => [
               a.org.legalName,
               <TierBadge key="t" tierId={a.org.tierId} />,
@@ -103,25 +105,41 @@ function Summary({
   caption: string;
   tone?: "warn" | "danger";
 }) {
+  // Semantic TEXT rides the dark-safe *-text pairs (DS §9.1 / AM-01); stat numerals are
+  // Public Sans + tabular — serif is reserved for the flagship KPI (DS §3).
   const color =
-    tone === "warn" ? "text-[var(--color-warning)]" : tone === "danger" ? "text-[var(--color-danger)]" : "text-fg";
+    tone === "warn" ? "text-warning-text" : tone === "danger" ? "text-danger-text" : "text-fg";
   return (
     <Card className="p-5">
       <div className="text-sm text-muted">{label}</div>
-      <div className={`tabular mt-1 font-display text-2xl font-semibold ${color}`}>{value}</div>
+      <div className={`tabular mt-1 text-2xl font-semibold ${color}`}>{value}</div>
       <div className="mt-1 text-xs text-muted">{caption}</div>
     </Card>
   );
 }
 
-function Table({ head, rows }: { head: string[]; rows: React.ReactNode[][] }) {
+function Table({
+  head,
+  rows,
+  numericCols = [],
+}: {
+  head: string[];
+  rows: React.ReactNode[][];
+  /** Column indexes whose header + cells right-align (06 A.10 numerics rule). */
+  numericCols?: number[];
+}) {
+  // Cell padding 16×12 on-token (LAY-07: 20px is sanctioned as card padding only).
+  const alignClass = (j: number) => (numericCols.includes(j) ? "text-right" : "text-left");
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-[var(--color-border)] text-left">
-            {head.map((h) => (
-              <th key={h} className="whitespace-nowrap px-5 py-3 font-medium text-muted">
+          <tr className="border-b border-[var(--color-border)]">
+            {head.map((h, j) => (
+              <th
+                key={h}
+                className={`whitespace-nowrap px-4 py-3 font-medium text-muted ${alignClass(j)}`}
+              >
                 {h}
               </th>
             ))}
@@ -134,7 +152,7 @@ function Table({ head, rows }: { head: string[]; rows: React.ReactNode[][] }) {
               className="border-b border-[var(--color-border)] transition-colors duration-[var(--dur-fast)] last:border-0 hover:bg-surface-2"
             >
               {row.map((cell, j) => (
-                <td key={j} className="px-5 py-3 align-middle text-fg">
+                <td key={j} className={`px-4 py-3 align-middle text-fg ${alignClass(j)}`}>
                   {cell}
                 </td>
               ))}

@@ -28,7 +28,7 @@ export function ModulePlaceholder({
         <Badge variant="brand">Planned · this PH-1 slice</Badge>
         <ul className="mt-4 space-y-2">
           {points.map((p) => (
-            <li key={p} className="flex items-start gap-2.5 text-sm text-fg">
+            <li key={p} className="flex items-start gap-3 text-sm text-fg">
               <Icon className="mt-0.5 size-4 shrink-0 text-brand-600" aria-hidden />
               {p}
             </li>
@@ -36,7 +36,7 @@ export function ModulePlaceholder({
         </ul>
         <Link
           href="/dashboard"
-          className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline dark:text-brand-500"
+          className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline dark:text-brand-300"
         >
           <ArrowLeft className="size-4" /> Back to dashboard
         </Link>

@@ -114,7 +114,9 @@ export const FLAG_LABEL: Record<ScreeningFlag, string> = {
   deviation: ">50% from series median",
   spike: "≥100× median (hard flag)",
   duplicate: "Suspected duplicate (same officer/day)",
-  "geo-missing": "Location not captured",
+  // Distinct from the provenance chip's "Location not captured" (CE2-01/CON-R2-05):
+  // the screening flag names the screen result, the chip states the capture status.
+  "geo-missing": "Screen: location missing",
 };
 
 // ── Audit log (append-only) ──────────────────────────────────────────────────
@@ -130,7 +132,9 @@ export type AuditEntry = {
 
 export const auditLog: AuditEntry[] = [
   { id: "AL-8842", at: "2026-07-06 14:25", actor: "system", role: "System", action: "SCREENED", entity: "FS-3391", detail: "Auto-screen: 0 flags" },
-  { id: "AL-8841", at: "2026-07-06 12:06", actor: "system", role: "System", action: "SCREENED", entity: "FS-3390", detail: "Auto-screen: flag deviation (+74% vs median)" },
+  // The +74% figure belongs to the FAO benchmark comparison shown on the queue card;
+  // the audit entry names the screen rule instead of misattributing that figure.
+  { id: "AL-8841", at: "2026-07-06 12:06", actor: "system", role: "System", action: "SCREENED", entity: "FS-3390", detail: "Auto-screen: flag deviation (>50% vs series median)" },
   { id: "AL-8840", at: "2026-07-06 10:14", actor: "Grace Auma", role: "Data Officer", action: "APPROVED", entity: "FS-3384", detail: "Maize · Mbarara · UGX 2,050/kg → published" },
   { id: "AL-8839", at: "2026-07-06 09:52", actor: "Grace Auma", role: "Data Officer", action: "REJECTED", entity: "FS-3383", detail: "Reason: price implausible, no photo" },
   { id: "AL-8838", at: "2026-07-05 17:20", actor: "Henry Kasumba", role: "Secretariat Staff", action: "TIER_CHANGE", entity: "org_kaali", detail: "Silver → Silver (grace applied)" },

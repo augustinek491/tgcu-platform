@@ -45,7 +45,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <nav className="flex items-center gap-2">
             <Link
               href="/pricing"
-              className="hidden px-3 text-sm font-medium text-muted hover:text-fg sm:block"
+              className="hidden min-h-11 items-center px-3 text-sm font-medium text-muted hover:text-fg sm:inline-flex"
             >
               Membership
             </Link>
@@ -78,7 +78,8 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="inline-block py-1 text-sm text-muted hover:text-fg"
+                        // ::after = invisible 44px hit-area (MOB-02) — visual link unchanged.
+                        className="relative inline-block py-1 text-sm text-muted hover:text-fg after:absolute after:inset-x-0 after:-inset-y-2"
                       >
                         {link.label}
                       </Link>
@@ -103,7 +104,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
               <span>© {new Date().getFullYear()} The Grain Council of Uganda</span>
               <span aria-hidden>·</span>
-              <span>Demonstration platform · sandbox data</span>
+              <span>Demonstration platform · seeded data</span>
               <span aria-hidden>·</span>
               <span>Informational, not financial advice</span>
             </div>

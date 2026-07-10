@@ -37,7 +37,7 @@ export function FreshnessIndicator({
 }) {
   return (
     <span
-      className="status-fade inline-flex items-center gap-1.5 text-xs text-muted"
+      className="status-fade inline-flex items-center gap-2 text-xs text-muted"
       title="Data freshness"
     >
       <SunArc className="size-3.5 shrink-0" />

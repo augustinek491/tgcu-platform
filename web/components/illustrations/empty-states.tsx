@@ -184,7 +184,7 @@ export function MapPinIllustration(props: IllustrationProps) {
         strokeWidth="2"
         strokeLinejoin="round"
         fill="var(--brand-300)"
-        fillOpacity="0.12"
+        fillOpacity="0.2"
       />
       {/* fold lines (secondary) */}
       <path d="M38 25 V65" stroke="var(--color-muted)" strokeWidth="2" />

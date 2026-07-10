@@ -31,7 +31,7 @@ export function ErrorState({
   return (
     <div
       role="alert"
-      className="mx-auto flex min-h-[60vh] w-full max-w-md flex-col items-center justify-center px-5 py-16 text-center"
+      className="mx-auto flex min-h-[60vh] w-full max-w-md flex-col items-center justify-center px-4 py-16 text-center"
     >
       <WheatSheafIllustration size={72} />
       <p className="mt-4 flex items-center justify-center gap-2 font-display text-xl font-semibold text-fg">
@@ -46,7 +46,7 @@ export function ErrorState({
         </a>
       </div>
       {digest && (
-        <p className="mt-4 font-mono text-[11px] text-muted">Reference: {digest}</p>
+        <p className="mt-4 font-mono text-xs text-muted">Reference: {digest}</p>
       )}
     </div>
   );

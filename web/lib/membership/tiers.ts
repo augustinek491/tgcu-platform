@@ -93,7 +93,9 @@ export const TIERS: Tier[] = [
     features: [
       "Everything in Gold",
       "Full TGCU price database",
-      "Tagtel real-time goods-in-transit tracking",
+      // One name per feature (CON-R2-07): converged on the labels.ts registry form —
+      // also avoids advertising "real-time" where the deal room shows check-ins.
+      "Tagtel goods-in-transit tracking",
       "Priority support",
     ],
     accentVar: "var(--tier-platinum)",

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Check, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TIERS } from "@/lib/membership/tiers";
 import { cn } from "@/lib/utils";
+import cropsMacro from "@/assets/crops-macro.jpg";
 
 export const metadata: Metadata = {
   title: "Membership tiers",
@@ -21,7 +23,9 @@ export default function PricingPage() {
         <Badge variant="brand" className="mb-4">
           TGCU Membership
         </Badge>
-        <h1 className="font-display text-4xl font-semibold text-fg">Choose your membership tier</h1>
+        <h1 className="font-display text-3xl font-semibold text-fg md:text-4xl lg:text-5xl">
+          Choose your membership tier
+        </h1>
         <p className="mt-4 text-lg text-muted">
           Unlock deeper grain price history and market tracking. Every tier builds on the last —
           start with today&apos;s prices, then reach further back and follow goods in transit as
@@ -29,7 +33,7 @@ export default function PricingPage() {
         </p>
       </div>
 
-      <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {TIERS.map((tier) => (
           <Card
             key={tier.id}
@@ -40,28 +44,35 @@ export default function PricingPage() {
           >
             {tier.popular && (
               <span
-                className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-[var(--radius-pill)] px-3 py-1 text-xs font-semibold text-white"
-                style={{ background: "var(--tier-gold)" }}
+                // Gold-family pill: ≤10% tint + gold text-safe pair, never white-on-gold
+                // (DS §9.1, ratified 2026-07-10). Solid mix over surface so the pill
+                // stays opaque where it straddles the card edge.
+                className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-[var(--radius-pill)] border border-[var(--tier-gold-text)] px-3 py-1 text-xs font-semibold"
+                style={{
+                  background: "color-mix(in srgb, var(--tier-gold) 10%, var(--color-surface))",
+                  color: "var(--tier-gold-text)",
+                }}
               >
                 <Star className="size-3.5 fill-current" /> Most popular
               </span>
             )}
             <div
               className="text-sm font-semibold uppercase tracking-wider"
-              style={{ color: tier.accentVar }}
+              // Tier NAME is text → tier text-safe pair; accentVar stays for fills only (AM-04).
+              style={{ color: `var(--tier-${tier.id}-text)` }}
             >
               {tier.name}
             </div>
             <p className="mt-1 text-sm text-muted">{tier.tagline}</p>
 
-            <div className="mt-5">
+            <div className="mt-6">
               <div className="font-display text-2xl font-semibold text-fg">Coming soon</div>
               <div className="text-xs text-muted">Pricing announced at launch</div>
             </div>
 
             <ul className="mt-6 flex-1 space-y-3">
               {tier.features.map((f) => (
-                <li key={f} className="flex items-start gap-2.5 text-sm text-fg">
+                <li key={f} className="flex items-start gap-3 text-sm text-fg">
                   <Check className="mt-0.5 size-4 shrink-0 text-brand-600" aria-hidden />
                   {f}
                 </li>
@@ -77,6 +88,20 @@ export default function PricingPage() {
           </Card>
         ))}
       </div>
+
+      {/* Placement 3 (IMAGERY-PROGRAMME / IMG-01): the crop close-up family as a
+          restrained low-height band BELOW the tier data — data-first, never competing.
+          Lazy by default (no priority); ≤120KB served via sizes + quality. */}
+      <figure className="mt-12 overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)]">
+        <Image
+          src={cropsMacro}
+          alt="Dried maize and sorghum grains in golden light"
+          placeholder="blur"
+          quality={60}
+          sizes="(min-width: 1328px) 1232px, calc(100vw - 48px)"
+          className="h-[200px] w-full object-cover md:h-[220px]"
+        />
+      </figure>
 
       <p className="mx-auto mt-10 max-w-3xl text-center text-xs text-muted">
         Tiers differ only in how far back you can see and what you can track — prices are monthly

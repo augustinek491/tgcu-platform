@@ -52,18 +52,20 @@ export default function RolesPage() {
                   ))}
                 </tr>
               </thead>
+              {/* Compact-table cells on the 8px grid (LAY-06/08): py-2 keeps
+                  rows ≥36 per A.10's compact floor. */}
               <tbody>
                 {RBAC_MATRIX.map((row) => (
                   <tr key={row.capability} className="border-b border-[var(--color-border)] last:border-0">
-                    <td className="whitespace-nowrap px-4 py-2.5 text-fg">{row.capability}</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-fg">{row.capability}</td>
                     {row.perms.map((perm, i) => (
-                      <td key={i} className="px-3 py-2.5 text-center">
+                      <td key={i} className="px-3 py-2 text-center">
                         {perm === "—" ? (
                           <span className="text-muted">—</span>
                         ) : (
                           <span
                             className={cn(
-                              "inline-block rounded-[var(--radius-sm)] px-1.5 py-0.5 text-xs font-medium",
+                              "inline-block rounded-[var(--radius-sm)] px-2 py-1 text-xs font-medium",
                               perm.includes("A") || perm.includes("U") || perm.includes("C")
                                 ? "bg-brand-800/10 text-brand-800 dark:bg-brand-600/15 dark:text-brand-300"
                                 : "text-muted",

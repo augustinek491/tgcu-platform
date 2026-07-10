@@ -75,7 +75,8 @@ export function DealPanel({ deal: initial }: { deal: Deal }) {
               </div>
             </div>
             <div className="text-right">
-              <div className="tabular font-display text-lg font-semibold text-fg">
+              {/* Data numeral = Public Sans + tabular; serif reserved for the flagship KPI (DS §3). */}
+              <div className="tabular text-lg font-semibold text-fg">
                 {formatUGX(amount)}
               </div>
               <div className="tabular text-xs text-muted">
@@ -96,7 +97,7 @@ export function DealPanel({ deal: initial }: { deal: Deal }) {
                     className={cn(
                       "status-fade grid size-7 place-items-center rounded-full border-2 text-xs",
                       done && "border-[var(--color-success)] bg-[var(--color-success)] text-white",
-                      current && "border-brand-600 text-brand-700 dark:text-brand-500",
+                      current && "border-brand-600 text-brand-700 dark:text-brand-300",
                       !done && !current && "border-[var(--color-border)] text-muted",
                     )}
                   >
@@ -157,7 +158,7 @@ export function DealPanel({ deal: initial }: { deal: Deal }) {
             )}
             {state === "disputed" && (
               <div className="w-full rounded-[var(--radius-sm)] bg-[var(--color-warning)]/10 p-3">
-                <p className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-warning)]">
+                <p className="inline-flex items-center gap-1.5 text-sm font-medium text-warning-text">
                   <AlertTriangle className="size-4" /> Escrow frozen · admin resolution
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -172,7 +173,7 @@ export function DealPanel({ deal: initial }: { deal: Deal }) {
             )}
             {state === "completed" && (
               <div className="w-full">
-                <p className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-success)]">
+                <p className="inline-flex items-center gap-1.5 text-sm font-medium text-success-text">
                   <Check className="size-4" /> Completed · escrow released. Rate the seller:
                 </p>
                 <div className="mt-2 flex gap-1">
@@ -211,7 +212,7 @@ export function DealPanel({ deal: initial }: { deal: Deal }) {
         <CardHeader className="flex-row items-center justify-between">
           <div>
             <CardTitle>Goods in transit</CardTitle>
-            <p className="text-sm text-muted">Tagtel tracking · Deal #{initial.dealId}</p>
+            <p className="text-sm text-muted">Tagtel goods-in-transit tracking · Deal #{initial.dealId}</p>
           </div>
           {/* Platinum entitlement chip — violet tier accent, chip only (BR-11; 07 §6.4).
               `!` beats TierBadge's inline accent color with the AA text-safe step (DS §9.1). */}
@@ -219,14 +220,14 @@ export function DealPanel({ deal: initial }: { deal: Deal }) {
         </CardHeader>
         <CardContent className="space-y-3">
           {initial.transporter && (
-            <div className="flex items-center gap-2 rounded-[var(--radius-sm)] bg-surface-2 p-2.5 text-xs">
+            <div className="flex items-center gap-2 rounded-[var(--radius-sm)] bg-surface-2 p-3 text-xs">
               <Truck className="size-4 text-muted" />
               <span className="font-medium text-fg">{initial.transporter.name}</span>
               <span className="text-muted">· {initial.transporter.vehicle}</span>
             </div>
           )}
           <TrackingTimeline state={state} />
-          <div className="flex items-start gap-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] p-2.5 text-xs text-muted">
+          <div className="flex items-start gap-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] p-3 text-xs text-muted">
             <MapPin className="mt-0.5 size-3.5 shrink-0" />
             <span>
               No live GPS on this shipment — this is the{" "}
@@ -265,7 +266,7 @@ function TrackingTimeline({ state }: { state: DealState }) {
             >
               {it.done && <Check className="size-3" />}
             </span>
-            {i < items.length - 1 && <span className="my-0.5 w-0.5 flex-1 bg-[var(--color-border)]" />}
+            {i < items.length - 1 && <span className="my-1 w-0.5 flex-1 bg-[var(--color-border)]" />}
           </div>
           <div className="pb-1">
             <div className={cn("status-fade text-sm", it.done ? "font-medium text-fg" : "text-muted")}>{it.label}</div>

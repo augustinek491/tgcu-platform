@@ -6,12 +6,13 @@ import { auditLog } from "@/lib/demo/admin";
 
 export const metadata: Metadata = { title: "Audit log" };
 
+// Semantic TEXT rides the dark-safe *-text pairs, never the fill hexes (DS §9.1 / AM-01).
 const ACTION_TONE: Record<string, string> = {
-  APPROVED: "text-[var(--color-success)]",
-  REJECTED: "text-[var(--color-danger)]",
-  ROLE_ASSIGN: "text-[var(--color-info)]",
-  TIER_CHANGE: "text-[var(--color-warning)]",
-  THRESHOLD_CHANGE: "text-[var(--color-warning)]",
+  APPROVED: "text-success-text",
+  REJECTED: "text-danger-text",
+  ROLE_ASSIGN: "text-info-text",
+  TIER_CHANGE: "text-warning-text",
+  THRESHOLD_CHANGE: "text-warning-text",
 };
 
 export default function AuditPage() {
@@ -51,14 +52,16 @@ export default function AuditPage() {
                     key={e.id}
                     className="border-b border-[var(--color-border)] transition-colors duration-[var(--dur-fast)] last:border-0 hover:bg-surface-2"
                   >
-                    <td className="whitespace-nowrap px-4 py-2.5 text-muted">{e.at}</td>
-                    <td className="whitespace-nowrap px-4 py-2.5 text-fg">{e.actor}</td>
-                    <td className="whitespace-nowrap px-4 py-2.5 text-muted">{e.role}</td>
-                    <td className={`whitespace-nowrap px-4 py-2.5 font-medium ${ACTION_TONE[e.action] ?? "text-fg"}`}>
+                    {/* Cell padding 12px on-token (LAY-06 10px family; A.10
+                        comfortable-row standard 12×12). */}
+                    <td className="whitespace-nowrap px-4 py-3 text-muted">{e.at}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-fg">{e.actor}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-muted">{e.role}</td>
+                    <td className={`whitespace-nowrap px-4 py-3 font-medium ${ACTION_TONE[e.action] ?? "text-fg"}`}>
                       {e.action}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-2.5 text-fg">{e.entity}</td>
-                    <td className="px-4 py-2.5 text-muted">{e.detail}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-fg">{e.entity}</td>
+                    <td className="px-4 py-3 text-muted">{e.detail}</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ListingCard } from "./ListingCard";
 import { OfferDialog, type OfferDraft } from "./OfferDialog";
 import { GrainBasketIllustration } from "@/components/illustrations/empty-states";
@@ -21,6 +21,28 @@ const COMMODITIES = ["Maize", "Beans", "Rice", "Sorghum"];
 const REGIONS = ["Central", "Eastern", "Western", "Northern"];
 const GRADES: Grade[] = ["EAS2-Grade1", "EAS2-Grade2", "EAS2-Grade3", "ungraded"];
 
+/** sessionStorage key for recorded sandbox offers (FLOW-R2-02 / CON-R2-03): the offer
+ * dialog promises "recorded in your session only" — persisting for the browser
+ * session (and no longer) is what makes that copy literally true across navigation. */
+const OFFERS_KEY = "tgcu-demo-offers";
+
+function loadOffers(): Record<string, OfferDraft> {
+  try {
+    const raw = window.sessionStorage.getItem(OFFERS_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, OfferDraft>) : {};
+  } catch {
+    return {};
+  }
+}
+
+function persistOffers(offers: Record<string, OfferDraft>) {
+  try {
+    window.sessionStorage.setItem(OFFERS_KEY, JSON.stringify(offers));
+  } catch {
+    // Storage unavailable (private mode etc.) — offers stay page-local, still sandbox.
+  }
+}
+
 /** Browse + filter island. Filters are equalities + verified/open toggles (the
  * Firestore-supported set, FR-MKTPL-10). Honest empty state, never a dead-end. */
 export function MarketplaceBrowse() {
@@ -32,9 +54,14 @@ export function MarketplaceBrowse() {
     verifiedOnly: false,
     openToOffers: false,
   });
-  // FLOW-02: offer dialog + recorded offers (session-only demo-sandbox state).
+  // FLOW-02: offer dialog + recorded offers. Session-only demo-sandbox state that
+  // truly lasts the browser session: hydrated from sessionStorage after mount (SSR
+  // renders none, so markup matches), written back on every change.
   const [offerFor, setOfferFor] = useState<Listing | null>(null);
   const [offers, setOffers] = useState<Record<string, OfferDraft>>({});
+  useEffect(() => {
+    setOffers(loadOffers());
+  }, []);
 
   const results = useMemo(
     () =>
@@ -55,9 +82,9 @@ export function MarketplaceBrowse() {
     setF({ type: "all", commodity: "all", grade: "any", region: "all", verifiedOnly: false, openToOffers: false });
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)]">
+    <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
       {/* Filter rail */}
-      <aside className="space-y-5">
+      <aside className="space-y-6">
         <div className="flex items-center justify-between">
           <span className="font-display text-sm font-semibold text-fg">Filters</span>
           <button
@@ -141,7 +168,9 @@ export function MarketplaceBrowse() {
           initial={offers[offerFor.listingId]}
           onClose={() => setOfferFor(null)}
           onSubmit={(draft) => {
-            setOffers((p) => ({ ...p, [offerFor.listingId]: draft }));
+            const next = { ...offers, [offerFor.listingId]: draft };
+            setOffers(next);
+            persistOffers(next);
             setOfferFor(null);
           }}
         />

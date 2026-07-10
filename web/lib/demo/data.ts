@@ -142,7 +142,17 @@ export const priceTrend = {
  * has no latest-period observation and therefore can never appear here.
  */
 export const movers = (() => {
-  const rows: { abs: number; market: string; commodity: string; dir: "up" | "down"; pct: string; price: string; source: string }[] = [];
+  const rows: {
+    abs: number;
+    market: string;
+    commodity: string;
+    dir: "up" | "down";
+    pct: string;
+    price: string;
+    source: string;
+    /** 8-month market-level series for the A.7 row sparkline (nulls = gaps). */
+    spark: (number | null)[];
+  }[] = [];
   for (const m of MARKETS.filter((x) => x.reporting)) {
     let best: (typeof rows)[number] | null = null;
     for (const c of COMMODITIES) {
@@ -159,6 +169,8 @@ export const movers = (() => {
           pct: fmtPct(pct),
           price: fmt(now),
           source: c.source,
+          // Same engine as every other surface — reporting gaps stay visible (DV-04).
+          spark: MONTHS.slice(16).map((mo) => priceAt(c.id, m.id, mo.index)),
         };
       }
     }

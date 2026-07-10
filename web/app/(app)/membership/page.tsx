@@ -67,7 +67,7 @@ export default function MembershipPage() {
               {entitlements.map((e) => (
                 <li
                   key={e.key}
-                  className={`flex items-start gap-2.5 rounded-[var(--radius-sm)] px-2 py-1.5 text-sm ${e.on ? "text-fg" : "text-muted"}`}
+                  className={`flex items-start gap-3 rounded-[var(--radius-sm)] px-2 py-2 text-sm ${e.on ? "text-fg" : "text-muted"}`}
                 >
                   {e.on ? (
                     <Check className="mt-0.5 size-4 shrink-0 text-brand-600" aria-hidden />
@@ -77,7 +77,7 @@ export default function MembershipPage() {
                   <span>
                     {e.label}
                     {!e.on && (
-                      <Link href="/pricing" className="ml-1 text-brand-700 hover:underline dark:text-brand-500">
+                      <Link href="/pricing" className="ml-1 text-brand-700 hover:underline dark:text-brand-300">
                         View tiers
                       </Link>
                     )}

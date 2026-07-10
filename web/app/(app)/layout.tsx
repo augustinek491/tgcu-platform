@@ -13,7 +13,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Topbar hosts the <1024 drawer (MobileNav) — same isAdmin as the sidebar. */}
         <Topbar isAdmin />
-        <main id="main" className="mx-auto w-full max-w-[1440px] flex-1 px-5 py-6 md:px-8">
+        {/* px-4 mobile (LAY-07: 20px is card-padding-only); px-32/py-24 ≥768 per A.1 */}
+        <main id="main" className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 md:px-8">
           {children}
         </main>
       </div>

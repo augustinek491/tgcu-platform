@@ -55,11 +55,11 @@ export function TrendDataTable({
               key={row.period}
               className="border-b border-[var(--color-border)] transition-colors duration-[var(--dur-fast)] last:border-0 hover:bg-surface-2"
             >
-              <th scope="row" className="px-3 py-1.5 text-left text-sm font-medium text-fg">
+              <th scope="row" className="px-3 py-2 text-left text-sm font-medium text-fg">
                 {row.period}
               </th>
               {row.values.map((value, i) => (
-                <td key={seriesNames[i]} className="tabular px-3 py-1.5 text-right text-fg">
+                <td key={seriesNames[i]} className="tabular px-3 py-2 text-right text-fg">
                   {value == null ? (
                     <>
                       <span aria-hidden className="text-muted">
@@ -72,8 +72,8 @@ export function TrendDataTable({
                   )}
                 </td>
               ))}
-              <td className="px-3 py-1.5 text-xs text-muted">{source}</td>
-              <td className="tabular px-3 py-1.5 text-xs text-muted">{row.asOf}</td>
+              <td className="px-3 py-2 text-xs text-muted">{source}</td>
+              <td className="tabular px-3 py-2 text-xs text-muted">{row.asOf}</td>
             </tr>
           ))}
         </tbody>

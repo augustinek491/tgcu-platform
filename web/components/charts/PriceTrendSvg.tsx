@@ -1,5 +1,6 @@
 import { priceTrend } from "@/lib/demo/data";
 import { DrawIn } from "./DrawIn";
+import { TrendHoverLayer } from "./TrendHoverLayer";
 import styles from "./draw.module.css";
 
 /**
@@ -7,16 +8,26 @@ import styles from "./draw.module.css";
  * percent-space SVG that stretches to the card while axis text, dots, end-labels and
  * the gap annotation render as HTML — so tick text is real 12px at every breakpoint
  * (DV-10; the old fixed-viewBox render scaled ticks to 5.2px at 375). Heights follow
- * the A.6 matrix 200/240/320 (DV-15). Null months break the line and carry a visible
- * "no data" annotation — never fabricated continuity (FR-MKT-11, DV-04). Draw-in is
- * 400ms once via `--dur-draw`; reduced motion renders the final state (06 H.2).
+ * 200/240 (06 PART G) with the ratified 280 desktop step (AM-16 supersedes A.6's 320).
+ * Null months break the line and carry a visible "no data" annotation — never
+ * fabricated continuity (FR-MKT-11, DV-04). Draw-in is 400ms once via `--dur-draw`;
+ * reduced motion renders the final state (06 H.2). A thin client hover layer gives
+ * the static chart the A.6 tooltip (DV-R2-02) without any chart library.
  */
-const PLOT_HEIGHTS = "h-[200px] sm:h-[240px] lg:h-[320px]";
+const PLOT_HEIGHTS = "h-[200px] sm:h-[240px] lg:h-[280px]";
 
 const tickLabel = (m: { label: string; year: number }) => `${m.label} '${String(m.year).slice(-2)}`;
 const fullLabel = (m: { label: string; year: number }) => `${m.label} ${m.year}`;
 
-export function PriceTrendSvg() {
+export function PriceTrendSvg({
+  plotHeights = PLOT_HEIGHTS,
+  source = "MAAIF / TGCU tracker",
+}: {
+  /** Override the plot-box height classes (e.g. the full-screen modal view). */
+  plotHeights?: string;
+  /** Canonical source label for the hover tooltip's provenance line (DS §9.7). */
+  source?: string;
+} = {}) {
   const { months, series, ariaLabel, gapNote } = priceTrend;
   const n = months.length;
   const all = series.flatMap((s) => s.points).filter((v): v is number => v != null);
@@ -35,7 +46,7 @@ export function PriceTrendSvg() {
     <figure className="m-0">
       <DrawIn className="flex gap-2">
         {/* Y axis — real HTML text, 12px at every breakpoint */}
-        <div className={`relative w-10 shrink-0 ${PLOT_HEIGHTS}`} aria-hidden>
+        <div className={`relative w-10 shrink-0 ${plotHeights}`} aria-hidden>
           {gridVals.map((v) => (
             <span
               key={v}
@@ -48,7 +59,7 @@ export function PriceTrendSvg() {
         </div>
 
         {/* Plot — percent-space SVG stretched to the card */}
-        <div className={`relative min-w-0 flex-1 ${PLOT_HEIGHTS}`}>
+        <div className={`relative min-w-0 flex-1 ${plotHeights}`}>
           <svg
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
@@ -133,10 +144,13 @@ export function PriceTrendSvg() {
                   ],
             ),
           )}
+
+          {/* A.6 hover tooltip (DV-R2-02) — thin client layer over the static plot */}
+          <TrendHoverLayer months={months} series={series} source={source} />
         </div>
 
         {/* End labels — readable without color (A.6); rail hidden on the narrowest screens */}
-        <div className={`relative hidden w-16 shrink-0 sm:block ${PLOT_HEIGHTS}`} aria-hidden>
+        <div className={`relative hidden w-16 shrink-0 sm:block ${plotHeights}`} aria-hidden>
           {series.map((s) => {
             const lastIdx = s.points.reduce<number>((acc, v, i) => (v != null ? i : acc), -1);
             if (lastIdx < 0) return null;

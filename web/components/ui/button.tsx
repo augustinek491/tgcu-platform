@@ -23,7 +23,9 @@ const buttonVariants = cva(
           "bg-[var(--color-danger)] text-white hover:bg-[color-mix(in_srgb,var(--color-danger)_85%,black)]",
       },
       size: {
-        sm: "h-9 px-3",
+        // sm keeps the 36px visual but carries an invisible ::before hit-area to 44px
+        // (A11Y-R2-12; ::before because cta-glint owns ::after). Focus ring unchanged.
+        sm: "relative h-9 px-3 before:absolute before:inset-x-0 before:-inset-y-1",
         md: "h-11 px-4", // 44px min touch target
         lg: "h-12 px-6 text-base",
         icon: "h-11 w-11",

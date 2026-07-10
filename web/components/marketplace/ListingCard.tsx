@@ -57,7 +57,8 @@ export function ListingCard({
       <div className="mt-3 flex items-baseline gap-1">
         {listing.priceUGXPerKg ? (
           <>
-            <span className="tabular font-display text-xl font-semibold text-fg">
+            {/* Data numeral = Public Sans + tabular; serif reserved for the flagship KPI (DS §3). */}
+            <span className="tabular text-xl font-semibold text-fg">
               {listing.priceUGXPerKg.toLocaleString()}
             </span>
             <span className="text-sm text-muted">UGX/kg</span>
@@ -68,8 +69,11 @@ export function ListingCard({
           </span>
         )}
       </div>
+      {/* Reference anchor — figure, basis and source label derive together from the
+          canonical market-data engine (CON-R2-01: one source label per figure). */}
       <div className="tabular mt-0.5 text-xs text-muted">
-        Reference UGX {listing.referenceUGXPerKg.toLocaleString()}/kg · MAAIF / TGCU tracker · as of Jun 2026
+        Reference UGX {listing.reference.ugxPerKg.toLocaleString()}/kg · {listing.reference.basis} ·{" "}
+        {listing.reference.source} · as of {listing.reference.asOf}
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs text-muted">
@@ -97,7 +101,7 @@ export function ListingCard({
       {/* Footer — stacked (identity / trust / action) so nothing competes for one
           cramped row; flex-1 + justify-end bottom-aligns it across the card row. */}
       <div className="mt-4 flex flex-1 flex-col justify-end">
-        <div className="space-y-2.5 border-t border-[var(--color-border)] pt-3">
+        <div className="space-y-3 border-t border-[var(--color-border)] pt-3">
           <div className="flex items-center gap-2">
             <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-800 text-xs font-semibold text-white">
               {seller.initials}
@@ -112,7 +116,7 @@ export function ListingCard({
                 <span className="tabular">{seller.deals} deals</span>
               </>
             ) : (
-              <span>New seller · no deals yet</span>
+              <span>Not yet verified · no deals yet</span>
             )}
             {seller.anchorBuyer && (
               <span className="rounded-[var(--radius-pill)] bg-grain-500/10 px-2 py-0.5 text-xs font-medium text-grain-700 dark:bg-grain-500/20 dark:text-grain-300">
@@ -131,7 +135,8 @@ export function ListingCard({
           <Button
             size="sm"
             variant={sentOffer ? "secondary" : isBuy ? "cta" : "primary"}
-            className="h-11 w-full lg:h-9"
+            // 44px touch / 40px desktop — F.1's md step; never 36 on a primary CTA (LAY-09).
+            className="h-11 w-full lg:h-10"
             onClick={() => onAction?.(listing)}
           >
             {sentOffer ? "Edit offer" : isBuy ? "Respond" : "Make offer"}

@@ -22,7 +22,7 @@ export function LoginForm() {
 
   return (
     <form onSubmit={continueDemo} className="space-y-4">
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-fg">
           Email
         </label>
@@ -34,7 +34,7 @@ export function LoginForm() {
           className="h-11 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 text-base focus-visible:border-ring"
         />
       </div>
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <label htmlFor="password" className="text-sm font-medium text-fg">
           Password
         </label>
@@ -46,7 +46,8 @@ export function LoginForm() {
           className="h-11 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-3 text-base focus-visible:border-ring"
         />
       </div>
-      <Button type="submit" size="lg" className="w-full" disabled={loading}>
+      {/* PART C: primary full-width h44 — md size, not lg/48 (LAY-09) */}
+      <Button type="submit" className="w-full" disabled={loading}>
         {loading ? "Signing in…" : "Continue to demo"}
         {!loading && <ArrowRight className="size-4" />}
       </Button>
