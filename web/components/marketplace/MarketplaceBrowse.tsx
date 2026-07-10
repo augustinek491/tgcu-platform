@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ListingCard } from "./ListingCard";
 import { OfferDialog, type OfferDraft } from "./OfferDialog";
 import { GrainBasketIllustration } from "@/components/illustrations/empty-states";
-import { cn } from "@/lib/utils";
+import { Segmented } from "@/components/ui/segmented";
 import { LISTINGS } from "@/lib/demo/marketplace";
 import { GRADE_LABEL, type Grade, type Listing, type ListingType } from "@/lib/marketplace/model";
 
@@ -97,22 +97,33 @@ export function MarketplaceBrowse() {
 
         <FilterGroup label="Type">
           <Segmented
-            options={[
-              { v: "all", l: "All" },
-              { v: "sell", l: "Sell" },
-              { v: "buy", l: "Buy" },
-            ]}
+            label="Listing type"
             value={f.type}
             onChange={(v) => set("type", v as Filters["type"])}
+            className="flex overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)]"
+            // min-h-11 = 44px touch target <lg (MOB-03); desktop keeps the compact control.
+            optionClassName="min-h-11 flex-1 px-2 py-2 text-xs font-medium lg:min-h-0"
+            options={[
+              { value: "all", label: "All" },
+              { value: "sell", label: "Sell" },
+              { value: "buy", label: "Buy" },
+            ]}
           />
         </FilterGroup>
 
         <FilterGroup label="Commodity">
-          <Radio options={["all", ...COMMODITIES]} value={f.commodity} labelFor={(v) => (v === "all" ? "All" : v)} onChange={(v) => set("commodity", v)} />
+          <Radio
+            label="Commodity"
+            options={["all", ...COMMODITIES]}
+            value={f.commodity}
+            labelFor={(v) => (v === "all" ? "All" : v)}
+            onChange={(v) => set("commodity", v)}
+          />
         </FilterGroup>
 
         <FilterGroup label="Grade (EAS 2)">
           <Radio
+            label="Grade (EAS 2)"
             options={["any", ...GRADES]}
             value={f.grade}
             labelFor={(v) => (v === "any" ? "Any grade" : GRADE_LABEL[v as Grade])}
@@ -121,7 +132,13 @@ export function MarketplaceBrowse() {
         </FilterGroup>
 
         <FilterGroup label="Region">
-          <Radio options={["all", ...REGIONS]} value={f.region} labelFor={(v) => (v === "all" ? "All of Uganda" : v)} onChange={(v) => set("region", v)} />
+          <Radio
+            label="Region"
+            options={["all", ...REGIONS]}
+            value={f.region}
+            labelFor={(v) => (v === "all" ? "All of Uganda" : v)}
+            onChange={(v) => set("region", v)}
+          />
         </FilterGroup>
 
         <div className="space-y-2">
@@ -188,62 +205,33 @@ function FilterGroup({ label, children }: { label: string; children: React.React
   );
 }
 
-function Segmented<T extends string>({
-  options,
-  value,
-  onChange,
-}: {
-  options: { v: T; l: string }[];
-  value: T;
-  onChange: (v: T) => void;
-}) {
-  return (
-    <div className="flex overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)]">
-      {options.map((o) => (
-        <button
-          key={o.v}
-          onClick={() => onChange(o.v)}
-          aria-pressed={value === o.v}
-          className={cn(
-            // min-h-11 = 44px touch target <lg (MOB-03); desktop keeps the compact control.
-            "min-h-11 flex-1 px-2 py-2 text-xs font-medium transition-colors lg:min-h-0",
-            value === o.v ? "bg-brand-800 text-white" : "text-muted hover:bg-surface-2",
-          )}
-        >
-          {o.l}
-        </button>
-      ))}
-    </div>
-  );
-}
-
+/** Vertical single-select filter group — the registry `<Segmented>` in radio mode
+ * (role=radiogroup + `role=radio`/`aria-checked` per option, DS §9.8/§9.10). */
 function Radio({
+  label,
   options,
   value,
   onChange,
   labelFor,
 }: {
+  label: string;
   options: string[];
   value: string;
   onChange: (v: string) => void;
   labelFor: (v: string) => string;
 }) {
   return (
-    <div className="space-y-1">
-      {options.map((o) => (
-        <button
-          key={o}
-          onClick={() => onChange(o)}
-          aria-pressed={value === o}
-          className={cn(
-            "flex min-h-11 w-full items-center rounded-[var(--radius-sm)] px-2 py-1 text-left text-sm transition-colors lg:min-h-0",
-            value === o ? "bg-brand-800/10 font-medium text-brand-800 dark:bg-brand-600/15 dark:text-brand-300" : "text-muted hover:bg-surface-2",
-          )}
-        >
-          {labelFor(o)}
-        </button>
-      ))}
-    </div>
+    <Segmented
+      label={label}
+      mode="radio"
+      value={value}
+      onChange={onChange}
+      className="space-y-1"
+      optionClassName="flex min-h-11 w-full items-center rounded-[var(--radius-sm)] px-2 py-1 text-left text-sm lg:min-h-0"
+      activeClassName="bg-brand-800/10 font-medium text-brand-800 dark:bg-brand-600/15 dark:text-brand-300"
+      inactiveClassName="text-muted hover:bg-surface-2"
+      options={options.map((o) => ({ value: o, label: labelFor(o) }))}
+    />
   );
 }
 

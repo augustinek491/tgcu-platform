@@ -158,7 +158,7 @@ export function DealPanel({ deal: initial }: { deal: Deal }) {
             )}
             {state === "disputed" && (
               <div className="w-full rounded-[var(--radius-sm)] bg-[var(--color-warning)]/10 p-3">
-                <p className="inline-flex items-center gap-1.5 text-sm font-medium text-warning-text">
+                <p className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--warning-badge-text)]">
                   <AlertTriangle className="size-4" /> Escrow frozen · admin resolution
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">

@@ -27,8 +27,17 @@ export type FieldSubmission = {
   geo: { lat: number; lng: number } | null; // null → geo-missing
   hasPhoto: boolean;
   flags: ScreeningFlag[];
-  /** External benchmark for cross-check (FR-ADM-09), or null if none available. */
-  benchmark: { value: number; source: string; date: string } | null;
+  /**
+   * External benchmark for cross-check (FR-ADM-09), or null if none available.
+   * `series` is the trailing trusted-series tail (oldest→newest, same UGX/kg unit)
+   * driving the E.2 cross-check sparkline; the benchmark `value` is its last point.
+   */
+  benchmark: { value: number; source: string; date: string; series: number[] } | null;
+  /**
+   * Submitter's recent review outcomes, newest last — drives the E.2 accuracy
+   * mini-bar. `true` = approved, `false` = rejected/returned.
+   */
+  officerOutcomes: boolean[];
   state: SubmissionState;
 };
 
@@ -45,7 +54,8 @@ export const submissions: FieldSubmission[] = [
     geo: { lat: 2.774, lng: 32.299 },
     hasPhoto: true,
     flags: [],
-    benchmark: { value: 1585, source: "WFP-HDX", date: "May 2026" },
+    benchmark: { value: 1585, source: "WFP-HDX", date: "May 2026", series: [1480, 1505, 1520, 1560, 1585] },
+    officerOutcomes: [true, true, false, true, true, true],
     state: "SCREENED",
   },
   {
@@ -60,7 +70,8 @@ export const submissions: FieldSubmission[] = [
     geo: { lat: 1.082, lng: 34.175 },
     hasPhoto: false,
     flags: ["deviation"],
-    benchmark: { value: 4650, source: "FAO GIEWS/FPMA", date: "Jun 2026" },
+    benchmark: { value: 4650, source: "FAO GIEWS/FPMA", date: "Jun 2026", series: [4390, 4470, 4520, 4580, 4650] },
+    officerOutcomes: [true, false, true, true, false, true],
     state: "SCREENED",
   },
   {
@@ -75,7 +86,8 @@ export const submissions: FieldSubmission[] = [
     geo: null,
     hasPhoto: false,
     flags: ["geo-missing"],
-    benchmark: { value: 1585, source: "WFP-HDX", date: "May 2026" },
+    benchmark: { value: 1585, source: "WFP-HDX", date: "May 2026", series: [1480, 1505, 1520, 1560, 1585] },
+    officerOutcomes: [false, true, false, true, false, false],
     state: "SUBMITTED",
   },
   {
@@ -91,6 +103,7 @@ export const submissions: FieldSubmission[] = [
     hasPhoto: true,
     flags: ["duplicate"],
     benchmark: null,
+    officerOutcomes: [true, true, false, true, true, true],
     state: "IN_REVIEW",
   },
   {
@@ -105,7 +118,8 @@ export const submissions: FieldSubmission[] = [
     geo: { lat: 0.424, lng: 33.204 },
     hasPhoto: true,
     flags: [],
-    benchmark: { value: 3910, source: "FAO GIEWS/FPMA", date: "Jun 2026" },
+    benchmark: { value: 3910, source: "FAO GIEWS/FPMA", date: "Jun 2026", series: [3760, 3820, 3850, 3880, 3910] },
+    officerOutcomes: [true, false, true, true, false, true],
     state: "SCREENED",
   },
 ];
@@ -117,6 +131,17 @@ export const FLAG_LABEL: Record<ScreeningFlag, string> = {
   // Distinct from the provenance chip's "Location not captured" (CE2-01/CON-R2-05):
   // the screening flag names the screen result, the chip states the capture status.
   "geo-missing": "Screen: location missing",
+};
+
+/**
+ * One-word pill labels for the E.1 queue row (R3-L-03) — the compact form of the
+ * screening flag. The detail-pane chips keep the full FLAG_LABEL sentence.
+ */
+export const FLAG_PILL: Record<ScreeningFlag, string> = {
+  deviation: "outlier",
+  spike: "spike",
+  duplicate: "duplicate",
+  "geo-missing": "no geo",
 };
 
 // ── Audit log (append-only) ──────────────────────────────────────────────────

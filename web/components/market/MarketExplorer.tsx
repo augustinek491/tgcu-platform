@@ -6,6 +6,7 @@ import { Lock } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FreshnessIndicator } from "@/components/shell/FreshnessIndicator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Segmented } from "@/components/ui/segmented";
 import { ChartTableSwitch } from "@/components/charts/ChartTableSwitch";
 import { ChartMaximize } from "@/components/charts/ChartMaximize";
 import { TrendDataTable } from "@/components/charts/TrendDataTable";
@@ -130,29 +131,25 @@ export function MarketExplorer({
           ))}
         </select>
 
-        <div className="flex overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)]">
-          {RANGES.map((r) => {
+        <Segmented
+          label="History range"
+          value={String(range)}
+          onChange={(v) => setRange(Number(v) as Range)}
+          className="flex overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)]"
+          // min-h-11 = 44px touch target (A11Y-R2-12); keyboard ring stays global.
+          optionClassName="inline-flex min-h-11 items-center gap-1 px-3 py-2 text-sm font-medium"
+          options={RANGES.map((r) => {
             const locked = r > maxRange;
-            const activeR = r === range;
-            return (
-              <button
-                key={r}
-                disabled={locked}
-                aria-pressed={activeR}
-                onClick={() => setRange(r)}
-                title={locked ? `${tierName} tier covers ${maxRange}mo — upgrade for more` : undefined}
-                className={cn(
-                  // min-h-11 = 44px touch target (A11Y-R2-12); keyboard ring stays global.
-                  "inline-flex min-h-11 items-center gap-1 px-3 py-2 text-sm font-medium transition-colors",
-                  activeR ? "bg-brand-800 text-white" : "text-muted hover:bg-surface-2",
-                  locked && "cursor-not-allowed opacity-50",
-                )}
-              >
-                {locked && <Lock className="size-3" />} {r}mo
-              </button>
-            );
+            return {
+              value: String(r),
+              label: `${r}mo`,
+              icon: locked ? <Lock className="size-3" /> : undefined,
+              disabled: locked,
+              title: locked ? `${tierName} tier covers ${maxRange}mo — upgrade for more` : undefined,
+              className: locked ? "cursor-not-allowed opacity-50" : undefined,
+            };
           })}
-        </div>
+        />
         <span className="text-xs text-muted">
           {tierName} tier · up to {maxRange === 24 ? "full" : `${maxRange}mo`} history
         </span>

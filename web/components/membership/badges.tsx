@@ -1,4 +1,3 @@
-import { BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { tierById, type TierId } from "@/lib/membership/tiers";
 import { STANDING_LABEL, type Standing } from "@/lib/membership/model";
@@ -46,15 +45,6 @@ export function StandingBadge({ standing }: { standing: Standing }) {
       )}
     >
       {STANDING_LABEL[standing]}
-    </span>
-  );
-}
-
-/** "Verified TGCU Member" trust badge (FR-MEM-03). */
-export function VerifiedBadge() {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-[var(--radius-pill)] bg-brand-300/25 px-2.5 py-0.5 text-xs font-medium text-brand-800 dark:text-brand-300">
-      <BadgeCheck className="size-3.5" /> Verified Member
     </span>
   );
 }

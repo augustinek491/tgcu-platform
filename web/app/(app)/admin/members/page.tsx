@@ -3,6 +3,7 @@ import { AlertTriangle } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TierBadge, StandingBadge } from "@/components/membership/badges";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { orgs, arrears, invoicesForOrg } from "@/lib/demo/membership";
 import { isVerified } from "@/lib/membership/model";
 import { formatUGX } from "@/lib/utils";
@@ -82,7 +83,7 @@ export default function AdminMembersPage() {
               <TierBadge key="ti" tierId={o.tierId} />,
               <StandingBadge key="st" standing={o.standing} />,
               isVerified(o) ? (
-                <Badge key="v" variant="brand">Verified</Badge>
+                <VerifiedBadge key="v" />
               ) : (
                 <span key="v" className="text-muted">—</span>
               ),

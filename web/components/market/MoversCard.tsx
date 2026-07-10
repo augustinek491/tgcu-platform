@@ -144,11 +144,18 @@ export function MoversCard({
                   aria-hidden="true"
                   className="ml-auto shrink-0 text-[var(--data)] lg:hidden xl:block"
                 >
+                  {/* stroke 2px (was 1.5): `--data` #2563EB reads 3.38:1 on the
+                      resting `--surface` but only 2.94:1 once the row hovers to
+                      `--surface-2` (#292524) in dark — under the WCAG 1.4.11 3:1
+                      graphics floor. The heavier stroke restores a compliant
+                      2px edge on BOTH row backdrops while staying single-hue
+                      `--data` (DS §9.4/DV-05); the value + pill remain the data
+                      record (DM3-04). */}
                   <polyline
                     points={sparkPoints(r.spark)}
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="1.5"
+                    strokeWidth="2"
                     strokeLinejoin="round"
                     strokeLinecap="round"
                   />

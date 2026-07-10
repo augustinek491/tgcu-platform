@@ -1,24 +1,53 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Check, X, RotateCcw, MapPin, Camera, AlertTriangle, CircleCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DeltaPill } from "@/components/ui/delta-pill";
 import { cn } from "@/lib/utils";
-import { submissions as seed, FLAG_LABEL, type FieldSubmission } from "@/lib/demo/admin";
+import { submissions as seed, FLAG_LABEL, FLAG_PILL, type FieldSubmission, type ScreeningFlag } from "@/lib/demo/admin";
 import { ClipboardCheckIllustration } from "@/components/illustrations/empty-states";
 
 type Decision = "APPROVED" | "REJECTED" | "RETURNED";
 type ReasonKind = "REJECTED" | "RETURNED";
-type Recorded = { decision: Decision; reason?: string; at: string };
+/** `seq` is a monotonic order key so the decided list survives reload from storage alone. */
+type Recorded = { decision: Decision; reason?: string; at: string; seq: number };
 
 const DECISION_LABEL: Record<Decision, string> = {
   APPROVED: "Approved & published",
   REJECTED: "Rejected",
   RETURNED: "Returned for correction",
 };
+
+/**
+ * sessionStorage key for recorded verification decisions (CON-R3-01, the M14 major).
+ * The surface says "Approved (session)" / "Decisions this session" three times, but
+ * decisions lived in plain useState and `app/(app)/template.tsx` re-mounts on every
+ * navigation — so they vanished on any nav, making the copy false. Persisting to the
+ * browser session (mirroring the proven offer fix, MarketplaceBrowse `tgcu-demo-offers`)
+ * — hydrate on mount, write on every record — makes "session" literally true.
+ */
+const DECISIONS_KEY = "tgcu-demo-decisions";
+
+function loadDecisions(): Record<string, Recorded> {
+  try {
+    const raw = window.sessionStorage.getItem(DECISIONS_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, Recorded>) : {};
+  } catch {
+    return {};
+  }
+}
+
+function persistDecisions(decisions: Record<string, Recorded>) {
+  try {
+    window.sessionStorage.setItem(DECISIONS_KEY, JSON.stringify(decisions));
+  } catch {
+    // Storage unavailable (private mode etc.) — decisions stay page-local, still sandbox.
+  }
+}
 
 const initials = (name: string) =>
   name
@@ -28,13 +57,25 @@ const initials = (name: string) =>
     .join("")
     .toUpperCase();
 
+const deltaPct = (s: FieldSubmission) =>
+  s.benchmark ? ((s.priceUGXPerKg - s.benchmark.value) / s.benchmark.value) * 100 : null;
+
+/** Parse "6 Jul 2026, 14:22" → epoch ms for the oldest/newest sort (E.1 toolbar). */
+const submittedMs = (s: FieldSubmission) => {
+  const t = Date.parse(s.submittedAt.replace(",", ""));
+  return Number.isNaN(t) ? 0 : t;
+};
+
+type StatusFilter = "all" | "pending" | "flagged";
+
 /**
  * Field-data verification queue (FR-ADM-05/07/08/09) in the binding 06 E.1
- * master/detail composition (LAY-03): left queue list (420px at ≥1024; stacked
- * above the detail below 1024) + right detail panel — THE decision surface,
- * with a sticky decision bar (E.2). Exactly ONE decision set is visible at a
- * time; the list is keyboard-navigable (arrow keys, roving tabindex) and
- * selection stays in sync with the detail pane.
+ * master/detail composition (LAY-03): left queue list (minmax(320,420) at ≥1024,
+ * so the detail — the decision surface — keeps ≥380px, §9.10; stacked above the
+ * detail below 1024) + right detail panel — THE decision surface, with a sticky
+ * decision bar (E.2). Exactly ONE decision set is visible at a time; the list is
+ * keyboard-navigable (arrow keys, roving tabindex) and selection stays in sync
+ * with the detail pane.
  *
  * Integrity rules unchanged: nothing enters trusted data except via an explicit
  * human APPROVE — no time-out self-publish (fail-closed). Reject/return require
@@ -42,39 +83,80 @@ const initials = (name: string) =>
  * and it is kept in the session decision log. Provenance, screening flags and
  * the external cross-check delta are surfaced so reviewers focus on suspect
  * values. On decision, the list advances to the next pending item (E.2).
+ *
+ * Decisions persist for the browser session (sessionStorage, CON-R3-01) so the
+ * "session" copy is literally true across navigation — the (app) template
+ * re-mounts every route change and would otherwise reset the queue.
  */
 export function VerificationQueue() {
   const items = seed;
   const [decisions, setDecisions] = useState<Record<string, Recorded>>({});
-  const [order, setOrder] = useState<string[]>([]);
+  // CON-R3-01: hydrate recorded decisions from sessionStorage after mount (SSR
+  // renders none, so the markup matches), then write back on every record().
+  useEffect(() => {
+    setDecisions(loadDecisions());
+  }, []);
+  const seqRef = useRef(0);
   const [reasonFor, setReasonFor] = useState<{ id: string; kind: ReasonKind } | null>(null);
   const [reasonText, setReasonText] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(items[0]?.id ?? null);
+
+  // E.1 toolbar (R3-L-02): status + commodity filters and an oldest/newest sort,
+  // operating on the seeded queue. Oldest-first is the fail-closed default.
+  const [status, setStatus] = useState<StatusFilter>("all");
+  const [commodity, setCommodity] = useState<string>("all");
+  const [oldestFirst, setOldestFirst] = useState(true);
+
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const logRef = useRef<HTMLElement | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
   const detailRef = useRef<HTMLDivElement | null>(null);
 
-  const pending = items.filter((s) => !decisions[s.id]);
+  const commodities = useMemo(
+    () => Array.from(new Set(items.map((s) => s.commodity))).sort(),
+    [items],
+  );
+
+  const pending = useMemo(() => {
+    const rows = items
+      .filter((s) => !decisions[s.id])
+      .filter((s) => (commodity === "all" ? true : s.commodity === commodity))
+      .filter((s) =>
+        status === "all" ? true : status === "flagged" ? s.flags.length > 0 : true,
+      );
+    rows.sort((a, b) => (oldestFirst ? submittedMs(a) - submittedMs(b) : submittedMs(b) - submittedMs(a)));
+    return rows;
+  }, [items, decisions, status, commodity, oldestFirst]);
+
+  // Count of undecided rows regardless of filter — the honest "still to review" total.
+  const undecidedTotal = items.filter((s) => !decisions[s.id]).length;
   const selected = pending.find((s) => s.id === selectedId) ?? pending[0] ?? null;
-  const decided = order
-    .map((id) => ({ s: items.find((i) => i.id === id)!, d: decisions[id] }))
-    .filter((r) => r.d != null);
+  const decided = useMemo(
+    () =>
+      Object.entries(decisions)
+        .map(([id, d]) => ({ s: items.find((i) => i.id === id)!, d }))
+        .filter((r) => r.s != null)
+        .sort((a, b) => b.d.seq - a.d.seq),
+    [decisions, items],
+  );
   const recorded = Object.values(decisions);
 
   const now = () =>
     new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 
   function record(id: string, decision: Decision, reason?: string) {
-    setDecisions((prev) => ({ ...prev, [id]: { decision, reason, at: now() } }));
-    setOrder((prev) => [id, ...prev]);
-    setReasonFor(null);
-    setReasonText("");
-    // E.2: the list advances to the next pending item (the row that takes the
-    // decided row's place; clamps to the new last row at the end of the queue).
+    // Advance to the next pending row BEFORE the decision removes this one (E.2).
     const idx = pending.findIndex((s) => s.id === id);
     const rest = pending.filter((s) => s.id !== id);
     setSelectedId(rest[Math.min(Math.max(idx, 0), rest.length - 1)]?.id ?? null);
+
+    setDecisions((prev) => {
+      const next = { ...prev, [id]: { decision, reason, at: now(), seq: ++seqRef.current } };
+      persistDecisions(next);
+      return next;
+    });
+    setReasonFor(null);
+    setReasonText("");
     // The record leaves the queue — move focus to the decision log so the
     // recorded outcome is the next thing keyboard/SR users land on.
     requestAnimationFrame(() => logRef.current?.focus());
@@ -129,15 +211,18 @@ export function VerificationQueue() {
     requestAnimationFrame(() => triggerRef.current?.focus());
   }
 
+  const selectCls =
+    "h-9 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-2 text-xs text-fg focus-visible:border-ring";
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3 text-sm">
-        <Stat label="Pending review" value={pending.length} />
+        <Stat label="Pending review" value={undecidedTotal} />
         <Stat label="Approved (session)" value={recorded.filter((d) => d.decision === "APPROVED").length} tone="success" />
         <Stat label="Rejected / returned" value={recorded.filter((d) => d.decision !== "APPROVED").length} tone="danger" />
       </div>
 
-      {pending.length === 0 ? (
+      {undecidedTotal === 0 ? (
         <Card className="p-10 text-center">
           <ClipboardCheckIllustration className="mx-auto" />
           <p className="mt-2 font-medium text-fg">Queue clear</p>
@@ -152,14 +237,48 @@ export function VerificationQueue() {
           </div>
         </Card>
       ) : (
-        /* E.1 master/detail: queue list w-420 + detail panel at ≥1024; stacked below. */
-        <div className="grid items-start gap-6 lg:grid-cols-[420px_minmax(0,1fr)]">
+        /* E.1 master/detail: queue list minmax(320,420) + detail panel at ≥1024; stacked below. */
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(320px,420px)_minmax(0,1fr)]">
           <Card className="min-w-0 p-0">
-            {/* E.1 toolbar: count + the fail-closed reminder micro-note */}
+            {/* E.1 toolbar (R3-L-02): compact status + commodity filters and an
+                oldest/newest sort, plus the fail-closed reminder micro-note. */}
             <div className="border-b border-[var(--color-border)] p-4">
               <p className="text-sm font-medium text-fg">Pending review ({pending.length})</p>
-              <p className="mt-1 text-xs text-muted">
-                Nothing publishes without a decision — oldest first.
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <label className="sr-only" htmlFor="vq-status">Filter by status</label>
+                <select
+                  id="vq-status"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as StatusFilter)}
+                  className={selectCls}
+                >
+                  <option value="all">All statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="flagged">Flagged</option>
+                </select>
+                <label className="sr-only" htmlFor="vq-commodity">Filter by commodity</label>
+                <select
+                  id="vq-commodity"
+                  value={commodity}
+                  onChange={(e) => setCommodity(e.target.value)}
+                  className={selectCls}
+                >
+                  <option value="all">All commodities</option>
+                  {commodities.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  aria-pressed={oldestFirst}
+                  onClick={() => setOldestFirst((v) => !v)}
+                  className="inline-flex h-9 items-center rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-surface px-2.5 text-xs font-medium text-fg hover:bg-surface-2"
+                >
+                  {oldestFirst ? "Oldest first" : "Newest first"}
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-muted">
+                Nothing publishes without a decision · oldest first.
               </p>
             </div>
             <ul
@@ -169,65 +288,71 @@ export function VerificationQueue() {
               onKeyDown={onListKeyDown}
               className="max-h-[560px] overflow-y-auto"
             >
-              {pending.map((s) => {
-                const active = s.id === selected?.id;
-                const delta = s.benchmark
-                  ? ((s.priceUGXPerKg - s.benchmark.value) / s.benchmark.value) * 100
-                  : null;
-                return (
-                  <li key={s.id} className="border-b border-[var(--color-border)] last:border-0">
-                    {/* E.1 row (h64): initials · commodity·market · value · status
-                        chip · flag count · cross-check delta · submitted time.
-                        Selected = left --brand-600 accent + tint. */}
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={active}
-                      data-row={s.id}
-                      tabIndex={active ? 0 : -1}
-                      onClick={() => select(s.id)}
-                      className={cn(
-                        "relative flex min-h-16 w-full items-center gap-3 px-4 py-2 text-left transition-colors duration-[var(--dur-fast)]",
-                        active ? "bg-brand-800/5 dark:bg-brand-600/10" : "hover:bg-surface-2",
-                      )}
-                    >
-                      {active && (
-                        <span aria-hidden className="absolute inset-y-0 left-0 w-0.5 bg-brand-600" />
-                      )}
-                      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 text-xs font-semibold text-fg">
-                        {initials(s.officer)}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="flex flex-wrap items-center gap-2">
-                          <span className="truncate text-sm font-medium text-fg">
-                            {s.commodity} · {s.market}
-                          </span>
-                          <Badge variant="neutral">
-                            {s.state === "SCREENED" ? "Screened" : "Submitted"}
-                          </Badge>
+              {pending.length === 0 ? (
+                <li className="px-4 py-6 text-center text-sm text-muted">
+                  No submissions match these filters — {undecidedTotal} still pending.
+                </li>
+              ) : (
+                pending.map((s) => {
+                  const active = s.id === selected?.id;
+                  const delta = deltaPct(s);
+                  return (
+                    <li key={s.id} className="border-b border-[var(--color-border)] last:border-0">
+                      {/* E.1 row (~h64): grain-500 unreviewed tick · initials ·
+                          commodity·market · value · status chip · flag pills ·
+                          cross-check DeltaPill · submitted time. Selected = left
+                          --brand-600 accent + tint; one-line meta at 420. */}
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={active}
+                        data-row={s.id}
+                        tabIndex={active ? 0 : -1}
+                        onClick={() => select(s.id)}
+                        className={cn(
+                          "relative flex min-h-16 w-full items-center gap-3 px-4 py-2 text-left transition-colors duration-[var(--dur-fast)]",
+                          active ? "bg-brand-800/5 dark:bg-brand-600/10" : "hover:bg-surface-2",
+                        )}
+                      >
+                        {/* Unreviewed left tick (grain-500); the brand accent takes over when selected. */}
+                        <span
+                          aria-hidden
+                          className="absolute inset-y-0 left-0 w-0.5"
+                          style={{ background: active ? "var(--brand-600)" : "var(--grain-500)" }}
+                        />
+                        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 text-xs font-semibold text-fg">
+                          {initials(s.officer)}
                         </span>
-                        <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-                          <span className="tabular font-medium text-fg">
-                            {s.priceUGXPerKg.toLocaleString()} UGX/kg
+                        <span className="min-w-0 flex-1">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span className="truncate text-sm font-medium text-fg">
+                              {s.commodity} · {s.market}
+                            </span>
+                            <Badge variant="neutral">
+                              {s.state === "SCREENED" ? "Screened" : "Submitted"}
+                            </Badge>
                           </span>
-                          {s.flags.length > 0 && (
-                            <span className="text-warning-text">
-                              {s.flags.length} flag{s.flags.length > 1 ? "s" : ""}
+                          <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                            <span className="tabular font-medium text-fg">
+                              {s.priceUGXPerKg.toLocaleString()} UGX/kg
                             </span>
-                          )}
-                          {delta != null && (
-                            <span className="tabular">
-                              {delta >= 0 ? "▲ +" : "▼ −"}
-                              {Math.abs(delta).toFixed(0)}% vs benchmark
-                            </span>
-                          )}
-                          <span>{s.submittedAt}</span>
+                            {s.flags.map((f) => (
+                              <FlagPill key={f} flag={f} />
+                            ))}
+                            {delta != null && (
+                              <DeltaPill dir={delta >= 0 ? "up" : "down"} valence={Math.abs(delta) > 40 ? "bad" : "good"}>
+                                {delta >= 0 ? "+" : "−"}
+                                {Math.abs(delta).toFixed(0)}%
+                              </DeltaPill>
+                            )}
+                            <span>{s.submittedAt}</span>
+                          </span>
                         </span>
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
+                      </button>
+                    </li>
+                  );
+                })
+              )}
             </ul>
           </Card>
 
@@ -288,7 +413,8 @@ export function VerificationQueue() {
             ))}
           </Card>
           <p className="text-xs text-muted">
-            Session-only demo state — a production decision also writes an audit entry and notifies the officer.
+            Session-only demo state — kept for this browser session; a production decision also
+            writes an audit entry and notifies the officer.
           </p>
         </section>
       )}
@@ -299,8 +425,10 @@ export function VerificationQueue() {
 /**
  * E.2 detail panel — the ONE decision surface. Header (mono record id ·
  * commodity·market·period · submitted value big tabular 28), provenance +
- * screening chips, cross-check block, the mandatory-reason disclosure, and the
- * sticky bottom decision bar with guardrail copy.
+ * screening chips, cross-check block (side-by-side submitted-vs-trusted with a
+ * delta chip + trusted-series sparkline; submitter accuracy mini-bar), the
+ * mandatory-reason disclosure, and the sticky bottom decision bar with
+ * guardrail copy.
  */
 function DetailPanel({
   s,
@@ -321,9 +449,7 @@ function DetailPanel({
   openReason: (e: React.MouseEvent<HTMLButtonElement>, id: string, kind: ReasonKind) => void;
   cancelReason: () => void;
 }) {
-  const delta = s.benchmark
-    ? ((s.priceUGXPerKg - s.benchmark.value) / s.benchmark.value) * 100
-    : null;
+  const delta = deltaPct(s);
   const bigDelta = delta != null && Math.abs(delta) > 40;
   const formOpen = reasonFor?.id === s.id;
 
@@ -372,21 +498,52 @@ function DetailPanel({
             )}
           </div>
 
-          {/* Cross-check */}
-          <div className="mt-3 rounded-[var(--radius-sm)] bg-surface-2 p-3 text-xs">
+          {/* E.2 cross-check block (R3-L-04): side-by-side submitted-vs-trusted value
+              with the delta as a chip + a 64×20 sparkline of the trusted series. */}
+          <div className="mt-3 rounded-[var(--radius-sm)] bg-surface-2 p-3">
             {s.benchmark ? (
-              <span className="text-muted">
-                External cross-check:{" "}
-                <span className="text-fg">UGX {s.benchmark.value.toLocaleString()}/kg</span> ·{" "}
-                {s.benchmark.source} · {s.benchmark.date} ·{" "}
-                <span className={cn("font-medium", bigDelta ? "text-danger-text" : "text-success-text")}>
-                  submitted {delta! >= 0 ? "+" : "−"}
-                  {Math.abs(delta!).toFixed(0)}% vs benchmark
-                </span>
-              </span>
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-muted">Submitted</p>
+                    <p className="tabular text-lg font-semibold text-fg">
+                      {s.priceUGXPerKg.toLocaleString()}{" "}
+                      <span className="text-xs font-normal text-muted">UGX/kg</span>
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-muted">Trusted series</p>
+                    <div className="flex items-end gap-2">
+                      <p className="tabular text-lg font-semibold text-fg">
+                        {s.benchmark.value.toLocaleString()}{" "}
+                        <span className="text-xs font-normal text-muted">UGX/kg</span>
+                      </p>
+                      <Sparkline values={s.benchmark.series} className="mb-1" />
+                    </div>
+                  </div>
+                  {delta != null && (
+                    <DeltaPill dir={delta >= 0 ? "up" : "down"} valence={bigDelta ? "bad" : "good"} className="mb-1">
+                      {delta >= 0 ? "+" : "−"}
+                      {Math.abs(delta).toFixed(0)}% vs trusted
+                    </DeltaPill>
+                  )}
+                </div>
+                <p className="text-xs text-muted">
+                  {s.benchmark.source} · trailing 5 months to {s.benchmark.date}
+                </p>
+              </div>
             ) : (
-              <span className="text-muted">No external benchmark available for this commodity/period.</span>
+              <p className="text-xs text-muted">No external benchmark available for this commodity/period.</p>
             )}
+          </div>
+
+          {/* E.2 submitter accuracy history — mini-bar of recent outcomes */}
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
+            <span className="text-muted">Submitter’s recent outcomes</span>
+            <OutcomeBar outcomes={s.officerOutcomes} />
+            <span className="tabular text-muted">
+              {s.officerOutcomes.filter(Boolean).length}/{s.officerOutcomes.length} approved
+            </span>
           </div>
 
           {/* Mandatory reason (FR-ADM-07) — the decision cannot commit without it */}
@@ -482,6 +639,69 @@ function Stat({ label, value, tone }: { label: string; value: number; tone?: "su
       <span className={cn("tabular font-semibold", color)}>{value}</span>{" "}
       <span className="text-muted">{label}</span>
     </div>
+  );
+}
+
+/** Compact screening pill for the E.1 row (R3-L-03) — warning-tinted, one word. */
+function FlagPill({ flag }: { flag: ScreeningFlag }) {
+  return (
+    <span className="inline-flex items-center rounded-[var(--radius-pill)] bg-[var(--color-warning)]/14 px-1.5 py-0.5 text-[11px] font-medium text-[var(--warning-badge-text)] dark:bg-[var(--color-warning)]/20">
+      {FLAG_PILL[flag]}
+    </span>
+  );
+}
+
+/**
+ * Minimal inline sparkline (64×20) of the trusted series for the E.2 cross-check
+ * (R3-L-04) — built here so the admin surface takes no chart-lane dependency
+ * (MoversCard is F3 territory). Decorative: the numbers alongside carry the data.
+ */
+function Sparkline({ values, className }: { values: number[]; className?: string }) {
+  const w = 64;
+  const h = 20;
+  if (values.length < 2) return null;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const step = w / (values.length - 1);
+  const pts = values
+    .map((v, i) => `${(i * step).toFixed(1)},${(h - 2 - ((v - min) / span) * (h - 4)).toFixed(1)}`)
+    .join(" ");
+  const rising = values[values.length - 1] >= values[0];
+  return (
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      width={w}
+      height={h}
+      className={className}
+      aria-hidden
+      focusable="false"
+      style={{ overflow: "visible" }}
+    >
+      <polyline
+        points={pts}
+        fill="none"
+        stroke={rising ? "var(--color-success)" : "var(--color-danger)"}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** Recent-outcome mini-bar for the E.2 submitter-accuracy block (R3-L-04). */
+function OutcomeBar({ outcomes }: { outcomes: boolean[] }) {
+  return (
+    <span className="inline-flex items-center gap-1" aria-hidden>
+      {outcomes.map((ok, i) => (
+        <span
+          key={i}
+          className="h-3.5 w-1.5 rounded-[1px]"
+          style={{ background: ok ? "var(--color-success)" : "var(--color-danger)" }}
+        />
+      ))}
+    </span>
   );
 }
 

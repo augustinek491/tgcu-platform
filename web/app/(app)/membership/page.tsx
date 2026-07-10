@@ -4,7 +4,8 @@ import { Check, Lock, ArrowUpRight, Download } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { TierBadge, StandingBadge, VerifiedBadge } from "@/components/membership/badges";
+import { TierBadge, StandingBadge } from "@/components/membership/badges";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { DuesCard } from "@/components/membership/DuesCard";
 import { currentOrg, invoicesForOrg, receiptsForOrg } from "@/lib/demo/membership";
 import { tierById } from "@/lib/membership/tiers";
@@ -34,7 +35,7 @@ export default function MembershipPage() {
             <h1 className="font-display text-[28px] font-semibold text-fg">
               {org.tradingName ?? org.legalName}
             </h1>
-            {isVerified(org) && <VerifiedBadge />}
+            {isVerified(org) && <VerifiedBadge label="Verified Member" />}
           </div>
           <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
             <span className="capitalize">{org.type}</span> · {org.district} · Member since{" "}
