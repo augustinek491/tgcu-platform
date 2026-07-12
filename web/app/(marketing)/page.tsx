@@ -5,8 +5,9 @@ import { LineChart, Users, Store, ShieldCheck, ArrowRight, Check } from "lucide-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import heroMaizeField from "@/assets/hero-maize-field.jpg";
-import traderWarehouse from "@/assets/trader-warehouse.jpg";
+import heroMaizeField from "@/assets/hero-maize-field.avif";
+import traderWarehouse from "@/assets/trader-warehouse.avif";
+import { heroBlur, traderBlur } from "@/lib/image-blur";
 import { orgs } from "@/lib/demo/membership";
 import { MARKETS, MONTHS } from "@/lib/demo/marketdata";
 import { asOfLabel } from "@/lib/demo/data";
@@ -143,7 +144,7 @@ export default function LandingPage() {
             fill
             priority
             placeholder="blur"
-            quality={70}
+            blurDataURL={heroBlur}
             sizes="100vw"
             className="object-cover"
           />
@@ -207,7 +208,7 @@ export default function LandingPage() {
               src={traderWarehouse}
               alt="A grain trader examining a handful of maize inside a warehouse"
               placeholder="blur"
-              quality={70}
+              blurDataURL={traderBlur}
               sizes="(min-width: 1024px) 592px, 100vw"
               className="h-auto w-full object-cover"
             />

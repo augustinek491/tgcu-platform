@@ -2,8 +2,8 @@
  * Data-freshness trust cue — "as of · source". Non-negotiable premium cue
  * (DESIGN-SYSTEM §7): every data surface shows freshness + source, monthly-not-live.
  *
- * The glyph is the DS §9.6 sun-arc motif (freshness/progress — micro version of the
- * LogoMark's golden rising-sun arc), replacing the generic CircleCheck (MOT-16).
+ * The glyph is the DS §9.6 gold-crescent-arc motif (freshness/progress — echoes the
+ * official emblem's gold crescent), replacing the generic CircleCheck (MOT-16).
  * Same 14px footprint + decorative behavior as before; `status-fade` gives content
  * refreshes a gentle 240ms ease-out opacity tween (DS §9.5; 0ms under
  * prefers-reduced-motion via --dur-status).

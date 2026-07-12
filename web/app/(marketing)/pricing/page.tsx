@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TIERS } from "@/lib/membership/tiers";
 import { cn } from "@/lib/utils";
-import cropsMacro from "@/assets/crops-macro.jpg";
+import cropsMacro from "@/assets/crops-macro.avif";
+import { cropsBlur } from "@/lib/image-blur";
 
 export const metadata: Metadata = {
   title: "Membership tiers",
@@ -93,14 +94,14 @@ export default function PricingPage() {
           restrained low-height band BELOW the tier data — data-first, never competing.
           Lazy by default (no priority); ≤120KB served via sizes + quality. */}
       <figure className="mt-12 overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)]">
-        {/* q74 (was 60) — the grain-macro texture read soft on retina at 60 (CE M17
-            lever). Source is 2560px so next/image serves a sharp 2× variant; the short
-            band keeps bytes modest. */}
+        {/* Pre-encoded 1440w AVIF (19KB) served static from the CDN edge — no /_next/image
+            optimizer round-trip (see next.config images.unoptimized). Inline blur-up + fixed
+            band height keep CLS 0. */}
         <Image
           src={cropsMacro}
           alt="Dried maize and sorghum grains in golden light"
           placeholder="blur"
-          quality={74}
+          blurDataURL={cropsBlur}
           sizes="(min-width: 1328px) 1232px, calc(100vw - 48px)"
           className="h-[200px] w-full object-cover md:h-[220px]"
         />
